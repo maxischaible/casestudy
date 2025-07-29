@@ -1,12 +1,23 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
-import { ArrowLeft, MapPin, Globe, Calendar, TrendingUp, Package, Clock, Award, Plus } from 'lucide-react';
+import { 
+  ArrowLeft, 
+  MapPin, 
+  Globe, 
+  Calendar, 
+  TrendingUp, 
+  Package, 
+  Clock, 
+  Award, 
+  Plus,
+  AlertTriangle,
+  Search
+} from 'lucide-react';
 import { getSuppliers } from '@/data/seed';
 import { addToShortlist, isInShortlist } from '@/lib/storage';
 
@@ -40,6 +51,29 @@ export default function SupplierProfile() {
     });
   };
 
+  // Risk assessment
+  const isHighRisk = supplier.quality?.defect_rate_ppm > 1000 || 
+                     supplier.lead_time_days > 30 || 
+                     supplier.price_index > 1.2;
+
+  const handleFindAlternatives = () => {
+    // Navigate to search with pre-filled criteria based on supplier capabilities
+    const searchQuery = new URLSearchParams({
+      material: supplier.materials[0] || '',
+      process: supplier.processes[0] || '',
+      description: `Alternative to ${supplier.name}`,
+      findAlternative: 'true',
+      originalSupplier: supplier.id
+    });
+    
+    navigate(`/search?${searchQuery.toString()}`);
+    
+    toast({
+      title: "Finding Alternatives",
+      description: `Searching for suppliers similar to ${supplier.name}`,
+    });
+  };
+
   // Mock switching score calculation for display
   const switchingScore = 75 + Math.floor(Math.random() * 20);
 
@@ -68,14 +102,27 @@ export default function SupplierProfile() {
             )}
           </div>
         </div>
-        <Button
-          onClick={handleAddToShortlist}
-          disabled={isInShortlist(supplier.id)}
-          className="gap-2"
-        >
-          <Plus className="h-4 w-4" />
-          {isInShortlist(supplier.id) ? 'In Shortlist' : 'Add to Shortlist'}
-        </Button>
+        <div className="flex items-center gap-3">
+          <Button
+            onClick={handleAddToShortlist}
+            disabled={isInShortlist(supplier.id)}
+            className="gap-2"
+          >
+            <Plus className="h-4 w-4" />
+            {isInShortlist(supplier.id) ? 'In Shortlist' : 'Add to Shortlist'}
+          </Button>
+          
+          {isHighRisk && (
+            <Button 
+              onClick={handleFindAlternatives}
+              variant="outline"
+              className="gap-2 border-orange-200 text-orange-700 hover:bg-orange-50"
+            >
+              <Search className="h-4 w-4" />
+              Find Alternatives
+            </Button>
+          )}
+        </div>
       </div>
 
       <div className="grid lg:grid-cols-3 gap-6">
@@ -269,12 +316,18 @@ export default function SupplierProfile() {
 
         {/* Sidebar */}
         <div className="space-y-6">
-          <Card>
+          <Card className={isHighRisk ? "border-orange-200 bg-orange-50/50" : ""}>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
+                {isHighRisk && <AlertTriangle className="h-4 w-4 text-orange-600" />}
                 <TrendingUp className="h-5 w-5" />
                 Switching Score
               </CardTitle>
+              {isHighRisk && (
+                <CardDescription className="text-orange-700">
+                  High risk detected - consider finding alternatives
+                </CardDescription>
+              )}
             </CardHeader>
             <CardContent>
               <div className="text-center mb-4">
@@ -312,6 +365,19 @@ export default function SupplierProfile() {
                   <Progress value={88} className="h-1" />
                 </div>
               </div>
+              
+              {isHighRisk && (
+                <div className="pt-4 border-t">
+                  <Button 
+                    onClick={handleFindAlternatives}
+                    variant="outline"
+                    className="w-full border-orange-200 text-orange-700 hover:bg-orange-50"
+                  >
+                    <Search className="h-4 w-4 mr-2" />
+                    Find Alternative Suppliers
+                  </Button>
+                </div>
+              )}
             </CardContent>
           </Card>
 

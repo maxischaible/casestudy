@@ -19,7 +19,9 @@ import {
   Settings,
   FileText,
   Building2,
-  Eye
+  Eye,
+  Search,
+  TrendingDown
 } from 'lucide-react';
 import { getItems, getCompanySuppliers } from '@/data/seed';
 import { Item } from '@/types/domain';
@@ -115,6 +117,33 @@ export default function ItemDetail() {
     }
   };
 
+  // Risk and cost assessment
+  const isHighCost = item.unit_price > 50; // Example threshold
+  const isHighRisk = item.criticality === 'A' && item.lead_time_days > 21;
+  const isSupplyChainRisk = item.criticality === 'A' || item.lead_time_days > 30;
+  
+  const shouldFindAlternatives = isHighCost || isHighRisk || isSupplyChainRisk;
+
+  const handleFindAlternatives = () => {
+    // Navigate to search with pre-filled criteria based on item specs
+    const searchQuery = new URLSearchParams({
+      material: item.material,
+      process: item.process,
+      description: item.description,
+      annual_volume: item.annual_volume.toString(),
+      target_unit_price: (item.unit_price * 0.8).toString(), // Target 20% savings
+      findAlternative: 'true',
+      originalItem: item.id
+    });
+    
+    navigate(`/search?${searchQuery.toString()}`);
+    
+    toast({
+      title: "Finding Alternatives",
+      description: `Searching for suppliers for ${item.part_number}`,
+    });
+  };
+
   return (
     <div className="max-w-6xl mx-auto space-y-6">
       {/* Header */}
@@ -132,6 +161,12 @@ export default function ItemDetail() {
         <div className="flex items-center gap-2">
           {getStatusBadge(item.status)}
           {getCriticalityBadge(item.criticality)}
+          {shouldFindAlternatives && (
+            <Badge variant="outline" className="border-orange-200 text-orange-700 bg-orange-50">
+              <AlertTriangle className="h-3 w-3 mr-1" />
+              Review Needed
+            </Badge>
+          )}
         </div>
       </div>
 
@@ -425,28 +460,64 @@ export default function ItemDetail() {
           </Card>
 
           {/* Supply Chain Risk */}
-          <Card>
+          <Card className={shouldFindAlternatives ? "border-orange-200 bg-orange-50/50" : ""}>
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
                 <AlertTriangle className="h-4 w-4" />
-                Supply Chain Risk
+                Supply Chain Assessment
               </CardTitle>
+              {shouldFindAlternatives && (
+                <CardDescription className="text-orange-700">
+                  Risk factors detected - consider finding alternatives
+                </CardDescription>
+              )}
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="flex items-center gap-2">
-                <CheckCircle className="h-4 w-4 text-green-600" />
-                <span className="text-sm">Single source - Low risk</span>
+                {isHighRisk ? (
+                  <AlertTriangle className="h-4 w-4 text-red-600" />
+                ) : (
+                  <CheckCircle className="h-4 w-4 text-green-600" />
+                )}
+                <span className="text-sm">
+                  {isHighRisk ? "High supply chain risk" : "Supply chain risk managed"}
+                </span>
               </div>
               
               <div className="flex items-center gap-2">
                 <Clock className="h-4 w-4 text-yellow-600" />
                 <span className="text-sm">Lead time: {item.lead_time_days} days</span>
+                {item.lead_time_days > 30 && (
+                  <Badge variant="outline" className="ml-2 text-orange-700 border-orange-200">
+                    Long lead time
+                  </Badge>
+                )}
               </div>
               
               <div className="flex items-center gap-2">
-                <DollarSign className="h-4 w-4 text-blue-600" />
-                <span className="text-sm">Price stability: Good</span>
+                <DollarSign className={`h-4 w-4 ${isHighCost ? 'text-red-600' : 'text-blue-600'}`} />
+                <span className="text-sm">
+                  {isHighCost ? "High cost item" : "Cost optimized"}
+                </span>
+                {isHighCost && (
+                  <Badge variant="outline" className="ml-2 text-red-700 border-red-200">
+                    Cost review needed
+                  </Badge>
+                )}
               </div>
+
+              {shouldFindAlternatives && (
+                <div className="pt-3 border-t">
+                  <Button 
+                    onClick={handleFindAlternatives}
+                    variant="outline"
+                    className="w-full border-orange-200 text-orange-700 hover:bg-orange-50"
+                  >
+                    <Search className="h-4 w-4 mr-2" />
+                    Find Alternative Suppliers
+                  </Button>
+                </div>
+              )}
             </CardContent>
           </Card>
 
@@ -461,10 +532,20 @@ export default function ItemDetail() {
                 Download Drawings
               </Button>
               
-              <Button className="w-full" variant="outline">
-                <TrendingUp className="h-4 w-4 mr-2" />
-                Request Quote
-              </Button>
+              {shouldFindAlternatives ? (
+                <Button 
+                  onClick={handleFindAlternatives}
+                  className="w-full bg-orange-600 hover:bg-orange-700 text-white"
+                >
+                  <TrendingDown className="h-4 w-4 mr-2" />
+                  Optimize Sourcing
+                </Button>
+              ) : (
+                <Button className="w-full" variant="outline">
+                  <TrendingUp className="h-4 w-4 mr-2" />
+                  Request Quote
+                </Button>
+              )}
               
               {supplier && (
                 <Button className="w-full" variant="outline" onClick={handleViewSupplier}>

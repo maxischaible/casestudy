@@ -32,12 +32,42 @@ export default function Search() {
   const [results, setResults] = useState<MatchResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
 
-  // Load demo data if demo=true in URL
+  // Load demo data if demo=true in URL or alternative search params
   useEffect(() => {
     if (searchParams.get('demo') === 'true') {
       const demoSpec = samplePartSpecs()[0];
       setPartSpec(demoSpec);
       handleSearch(demoSpec);
+    } else if (searchParams.get('findAlternative') === 'true') {
+      // Pre-fill form from search params for alternative search
+      const spec: PartSpec = {
+        part_number: searchParams.get('part_number') || '',
+        description: searchParams.get('description') || '',
+        material: searchParams.get('material') || '',
+        process: searchParams.get('process') || '',
+        annual_volume: parseInt(searchParams.get('annual_volume') || '0'),
+        target_unit_price: parseFloat(searchParams.get('target_unit_price') || '0') || undefined
+      };
+      setPartSpec(spec);
+      
+      // Show toast indicating this is an alternative search
+      const originalItem = searchParams.get('originalItem');
+      const originalSupplier = searchParams.get('originalSupplier');
+      
+      if (originalItem || originalSupplier) {
+        toast({
+          title: "Finding Alternatives",
+          description: originalItem 
+            ? "Searching for alternative suppliers for your item"
+            : "Searching for alternative suppliers",
+          duration: 3000
+        });
+      }
+      
+      // Auto-search if we have enough data
+      if (spec.description && spec.material && spec.process) {
+        setTimeout(() => handleSearch(spec), 500);
+      }
     }
   }, [searchParams]);
 
