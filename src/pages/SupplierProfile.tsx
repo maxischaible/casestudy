@@ -16,10 +16,14 @@ import {
   Award, 
   Plus,
   AlertTriangle,
-  Search
+  Search,
+  Eye,
+  TrendingDown,
+  DollarSign
 } from 'lucide-react';
-import { getSuppliers, getCompanySuppliers } from '@/data/seed';
+import { getSuppliers, getCompanySuppliers, getItems } from '@/data/seed';
 import { addToShortlist, isInShortlist } from '@/lib/storage';
+import { Item } from '@/types/domain';
 
 export default function SupplierProfile() {
   const { id } = useParams<{ id: string }>();
@@ -73,6 +77,13 @@ export default function SupplierProfile() {
     );
   }
 
+  // Get items supplied by this supplier
+  const allItems = getItems();
+  const supplierItems = allItems.filter(item => 
+    item.supplier_id === supplier.id || 
+    item.current_supplier.toLowerCase().includes(supplier.name.toLowerCase().split(' ')[0])
+  );
+
   const handleAddToShortlist = () => {
     addToShortlist(supplier);
     toast({
@@ -103,6 +114,78 @@ export default function SupplierProfile() {
       description: `Searching for suppliers similar to ${supplier.name}`,
     });
   };
+
+  const handleFindAlternativeForItem = (item: Item) => {
+    // Navigate to search with pre-filled criteria based on item specifications
+    const searchQuery = new URLSearchParams({
+      part_number: item.part_number,
+      description: item.description,
+      material: item.material,
+      process: item.process,
+      annual_volume: item.annual_volume.toString(),
+      target_unit_price: item.unit_price.toString(),
+      findAlternative: 'true',
+      originalItem: item.id,
+      originalSupplier: supplier.id
+    });
+    
+    navigate(`/search?${searchQuery.toString()}`);
+    
+    toast({
+      title: "Finding Alternative Suppliers",
+      description: `Searching for alternative suppliers for ${item.part_number}`,
+    });
+  };
+
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'EUR',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    }).format(value);
+  };
+
+  const getCriticalityBadge = (criticality: string) => {
+    const colors = {
+      'A': 'bg-red-100 text-red-800 border-red-200',
+      'B': 'bg-yellow-100 text-yellow-800 border-yellow-200', 
+      'C': 'bg-green-100 text-green-800 border-green-200'
+    };
+    
+    return (
+      <Badge className={colors[criticality as keyof typeof colors] || ''}>
+        {criticality}
+      </Badge>
+    );
+  };
+
+  const getStatusBadge = (status: string) => {
+    const variants = {
+      'Active': 'default',
+      'EOL': 'destructive', 
+      'Planned': 'secondary',
+      'On Hold': 'outline'
+    } as const;
+    
+    return <Badge variant={variants[status as keyof typeof variants] || 'outline'}>{status}</Badge>;
+  };
+
+  // Risk assessment for items (high-risk items should trigger alternative search suggestions)
+  const getItemRiskLevel = (item: Item) => {
+    if (item.criticality === 'A' && (item.status === 'EOL' || supplier.price_index > 1.1)) {
+      return 'high';
+    }
+    if ((item.criticality === 'B' && supplier.price_index > 1.2) || item.lead_time_days > 45) {
+      return 'medium';
+    }
+    return 'low';
+  };
+
+  // Calculate summary statistics for supplier items
+  const totalItemValue = supplierItems.reduce((sum, item) => sum + item.total_value, 0);
+  const criticalItems = supplierItems.filter(item => item.criticality === 'A').length;
+  const eolItems = supplierItems.filter(item => item.status === 'EOL').length;
 
   // Mock switching score calculation for display
   const switchingScore = 75 + Math.floor(Math.random() * 20);
@@ -159,8 +242,9 @@ export default function SupplierProfile() {
         {/* Main Content */}
         <div className="lg:col-span-2">
           <Tabs defaultValue="overview" className="space-y-6">
-            <TabsList className="grid w-full grid-cols-4">
+            <TabsList className="grid w-full grid-cols-5">
               <TabsTrigger value="overview">Overview</TabsTrigger>
+              <TabsTrigger value="items">Items ({supplierItems.length})</TabsTrigger>
               <TabsTrigger value="capabilities">Capabilities</TabsTrigger>
               <TabsTrigger value="certifications">Certifications</TabsTrigger>
               <TabsTrigger value="quality">Quality</TabsTrigger>
@@ -217,6 +301,161 @@ export default function SupplierProfile() {
                           </span>
                         )}
                       </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="items" className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <CardTitle>Supplied Items</CardTitle>
+                      <CardDescription>
+                        Items currently supplied by {supplier.name}
+                      </CardDescription>
+                    </div>
+                    <div className="flex items-center gap-4 text-sm">
+                      <div className="text-center">
+                        <div className="font-bold text-primary">{supplierItems.length}</div>
+                        <div className="text-muted-foreground">Total Items</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="font-bold text-primary">{formatCurrency(totalItemValue)}</div>
+                        <div className="text-muted-foreground">Annual Value</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="font-bold text-red-600">{criticalItems}</div>
+                        <div className="text-muted-foreground">Critical (A)</div>
+                      </div>
+                      {eolItems > 0 && (
+                        <div className="text-center">
+                          <div className="font-bold text-orange-600">{eolItems}</div>
+                          <div className="text-muted-foreground">EOL Items</div>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  {supplierItems.length > 0 ? (
+                    <div className="space-y-4">
+                      {supplierItems.map((item) => {
+                        const riskLevel = getItemRiskLevel(item);
+                        const showAlternativeButton = riskLevel === 'high' || riskLevel === 'medium';
+                        
+                        return (
+                          <div 
+                            key={item.id} 
+                            className={`p-4 border rounded-lg ${
+                              riskLevel === 'high' 
+                                ? 'border-red-200 bg-red-50/50' 
+                                : riskLevel === 'medium' 
+                                ? 'border-orange-200 bg-orange-50/50' 
+                                : 'border-border'
+                            }`}
+                          >
+                            <div className="flex justify-between items-start">
+                              <div className="flex-1 space-y-2">
+                                <div className="flex items-center gap-3">
+                                  <h4 className="font-medium">{item.part_number}</h4>
+                                  {getCriticalityBadge(item.criticality)}
+                                  {getStatusBadge(item.status)}
+                                  {riskLevel === 'high' && (
+                                    <Badge variant="destructive" className="gap-1">
+                                      <AlertTriangle className="h-3 w-3" />
+                                      High Risk
+                                    </Badge>
+                                  )}
+                                </div>
+                                
+                                <p className="text-sm text-muted-foreground">{item.description}</p>
+                                
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                                  <div>
+                                    <span className="font-medium">Material:</span>
+                                    <br />
+                                    <span className="text-muted-foreground">{item.material}</span>
+                                  </div>
+                                  <div>
+                                    <span className="font-medium">Process:</span>
+                                    <br />
+                                    <span className="text-muted-foreground">{item.process}</span>
+                                  </div>
+                                  <div>
+                                    <span className="font-medium">Annual Volume:</span>
+                                    <br />
+                                    <span className="text-muted-foreground">{item.annual_volume.toLocaleString()}</span>
+                                  </div>
+                                  <div>
+                                    <span className="font-medium">Unit Price:</span>
+                                    <br />
+                                    <span className="text-muted-foreground">{formatCurrency(item.unit_price)}</span>
+                                  </div>
+                                </div>
+                                
+                                <div className="flex items-center gap-4 text-sm">
+                                  <div className="flex items-center gap-1">
+                                    <Clock className="h-3 w-3 text-muted-foreground" />
+                                    <span>{item.lead_time_days} days lead time</span>
+                                  </div>
+                                  <div className="flex items-center gap-1">
+                                    <Package className="h-3 w-3 text-muted-foreground" />
+                                    <span>MOQ: {item.moq.toLocaleString()}</span>
+                                  </div>
+                                  <div className="flex items-center gap-1">
+                                    <DollarSign className="h-3 w-3 text-muted-foreground" />
+                                    <span>Total: {formatCurrency(item.total_value)}</span>
+                                  </div>
+                                </div>
+
+                                {(item.status === 'EOL' || riskLevel === 'high') && (
+                                  <div className="text-sm text-orange-700 bg-orange-100 p-2 rounded">
+                                    {item.status === 'EOL' && <span>⚠️ This item is End-of-Life. </span>}
+                                    {riskLevel === 'high' && <span>⚠️ High risk item - consider finding alternatives. </span>}
+                                    {supplier.price_index > 1.1 && <span>💰 Potential cost savings available. </span>}
+                                  </div>
+                                )}
+                              </div>
+                              
+                              <div className="flex flex-col gap-2 ml-4">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => navigate(`/item/${item.id}`)}
+                                  className="gap-2"
+                                >
+                                  <Eye className="h-4 w-4" />
+                                  View Details
+                                </Button>
+                                
+                                {showAlternativeButton && (
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => handleFindAlternativeForItem(item)}
+                                    className={`gap-2 ${
+                                      riskLevel === 'high' 
+                                        ? 'border-red-200 text-red-700 hover:bg-red-50' 
+                                        : 'border-orange-200 text-orange-700 hover:bg-orange-50'
+                                    }`}
+                                  >
+                                    <Search className="h-4 w-4" />
+                                    Find Alternatives
+                                  </Button>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8">
+                      <Package className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+                      <p className="text-muted-foreground">No items found for this supplier</p>
                     </div>
                   )}
                 </CardContent>
