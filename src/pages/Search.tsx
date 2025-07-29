@@ -7,17 +7,20 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
-import { Eye, Plus, MapPin, Clock, Package } from 'lucide-react';
+import { Eye, Plus, MapPin, Clock, Package, Filter as FilterIcon } from 'lucide-react';
 import { PartSpec, MatchResult } from '@/types/domain';
 import { getSuppliers, samplePartSpecs } from '@/data/seed';
 import { matchSuppliers } from '@/lib/match';
 import { addToShortlist, isInShortlist } from '@/lib/storage';
 import { useNavigate } from 'react-router-dom';
+import { useFilters } from '@/contexts/FilterContext';
+import { applyFilters } from '@/lib/filters';
 
 export default function Search() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { filters } = useFilters();
   const [partSpec, setPartSpec] = useState<PartSpec>({
     part_number: '',
     description: '',
@@ -53,14 +56,15 @@ export default function Search() {
     
     // Simulate API delay
     setTimeout(() => {
-      const suppliers = getSuppliers();
-      const matches = matchSuppliers(searchSpec, suppliers, { maxResults: 20 });
+      const allSuppliers = getSuppliers();
+      const filteredSuppliers = applyFilters(allSuppliers, filters);
+      const matches = matchSuppliers(searchSpec, filteredSuppliers, { maxResults: 20 });
       setResults(matches);
       setIsSearching(false);
       
       toast({
         title: "Search Complete",
-        description: `Found ${matches.length} matching suppliers`
+        description: `Found ${matches.length} matching suppliers (${filteredSuppliers.length} total after filters)`
       });
     }, 1000);
   };
@@ -86,9 +90,15 @@ export default function Search() {
     <div className="max-w-7xl mx-auto space-y-6">
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">Search & Match Suppliers</h1>
-        <Badge variant="outline">
-          {results.length} results
-        </Badge>
+        <div className="flex items-center gap-2">
+          <Badge variant="outline" className="gap-1">
+            <FilterIcon className="h-3 w-3" />
+            {Object.values(filters).flat().filter(f => f !== 'all' && f).length} filters active
+          </Badge>
+          <Badge variant="outline">
+            {results.length} results
+          </Badge>
+        </div>
       </div>
 
       {/* Part Specification Form */}

@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { SidebarProvider } from "@/components/ui/sidebar";
+import { FilterProvider } from "@/contexts/FilterContext";
 import AppShell from "./components/AppShell";
 import Demo from "./pages/Demo";
 import Search from "./pages/Search";
@@ -21,18 +22,20 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <AppShell>
-          <Routes>
-            <Route path="/" element={<Demo />} />
-            <Route path="/demo" element={<Demo />} />
-            <Route path="/search" element={<Search />} />
-            <Route path="/supplier/:id" element={<SupplierProfile />} />
-            <Route path="/compare" element={<Compare />} />
-            <Route path="/import" element={<ImportBOM />} />
-            <Route path="/admin" element={<Admin />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </AppShell>
+        <FilterProvider>
+          <AppShell>
+            <Routes>
+              <Route path="/" element={<Demo />} />
+              <Route path="/demo" element={<Demo />} />
+              <Route path="/search" element={<Search />} />
+              <Route path="/supplier/:id" element={<SupplierProfile />} />
+              <Route path="/compare" element={<Compare />} />
+              <Route path="/import" element={<ImportBOM />} />
+              <Route path="/admin" element={<Admin />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </AppShell>
+        </FilterProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

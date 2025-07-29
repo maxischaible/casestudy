@@ -13,13 +13,17 @@ import {
   Globe,
   Award,
   Cog,
-  Package
+  Package,
+  X
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Badge } from '@/components/ui/badge';
 import { Sidebar, SidebarContent, SidebarTrigger, SidebarProvider, useSidebar } from '@/components/ui/sidebar';
 import { getShortlist } from '@/lib/storage';
+import { useFilters } from '@/contexts/FilterContext';
+import { getSuppliers } from '@/data/seed';
+import { getFilterCounts } from '@/lib/filters';
 
 interface AppShellProps {
   children: React.ReactNode;
@@ -31,6 +35,150 @@ const navigation = [
   { name: 'Import BOM', href: '/import', icon: Upload },
   { name: 'Admin', href: '/admin', icon: Settings },
 ];
+
+function QuickFilters() {
+  const { filters, updateFilter, toggleCertification, toggleProcess, toggleMaterial, clearFilters } = useFilters();
+  const suppliers = getSuppliers();
+  const filterCounts = getFilterCounts(suppliers, filters);
+
+  const hasActiveFilters = filters.region !== 'all' || 
+                          filters.certifications.length > 0 || 
+                          filters.processes.length > 0 || 
+                          filters.materials.length > 0;
+
+  return (
+    <>
+      <div className="flex items-center justify-between mb-3">
+        <h3 className="font-medium text-sm flex items-center gap-2">
+          <Filter className="h-4 w-4" />
+          Quick Filters
+        </h3>
+        {hasActiveFilters && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={clearFilters}
+            className="h-6 w-6 p-0 hover:bg-muted"
+          >
+            <X className="h-3 w-3" />
+          </Button>
+        )}
+      </div>
+
+      <div className="space-y-3">
+        {/* Region Scope */}
+        <div>
+          <div className="text-xs text-muted-foreground mb-2 flex items-center gap-1">
+            <Globe className="h-3 w-3" />
+            Region Scope
+          </div>
+          <div className="flex flex-wrap gap-1">
+            <Badge 
+              variant={filters.region === 'dach' ? 'default' : 'outline'} 
+              className="text-xs cursor-pointer hover:bg-primary/90"
+              onClick={() => updateFilter('region', filters.region === 'dach' ? 'all' : 'dach')}
+            >
+              DACH ({filterCounts.region.dach})
+            </Badge>
+            <Badge 
+              variant={filters.region === 'eu27' ? 'default' : 'outline'} 
+              className="text-xs cursor-pointer hover:bg-primary/90"
+              onClick={() => updateFilter('region', filters.region === 'eu27' ? 'all' : 'eu27')}
+            >
+              EU-27 ({filterCounts.region.eu27})
+            </Badge>
+            <Badge 
+              variant={filters.region === 'global' ? 'default' : 'outline'} 
+              className="text-xs cursor-pointer hover:bg-primary/90"
+              onClick={() => updateFilter('region', filters.region === 'global' ? 'all' : 'global')}
+            >
+              Global ({filterCounts.region.global})
+            </Badge>
+          </div>
+        </div>
+        
+        {/* Certifications */}
+        <div>
+          <div className="text-xs text-muted-foreground mb-2 flex items-center gap-1">
+            <Award className="h-3 w-3" />
+            Certifications
+          </div>
+          <div className="flex flex-wrap gap-1">
+            <Badge 
+              variant={filters.certifications.includes('ISO9001') ? 'default' : 'outline'} 
+              className="text-xs cursor-pointer hover:bg-primary/90"
+              onClick={() => toggleCertification('ISO9001')}
+            >
+              ISO 9001 ({filterCounts.certifications['ISO9001'] || 0})
+            </Badge>
+            <Badge 
+              variant={filters.certifications.includes('IATF16949') ? 'default' : 'outline'} 
+              className="text-xs cursor-pointer hover:bg-primary/90"
+              onClick={() => toggleCertification('IATF16949')}
+            >
+              IATF 16949 ({filterCounts.certifications['IATF16949'] || 0})
+            </Badge>
+            <Badge 
+              variant={filters.certifications.includes('ISO14001') ? 'default' : 'outline'} 
+              className="text-xs cursor-pointer hover:bg-primary/90"
+              onClick={() => toggleCertification('ISO14001')}
+            >
+              ISO 14001 ({filterCounts.certifications['ISO14001'] || 0})
+            </Badge>
+          </div>
+        </div>
+
+        {/* Processes */}
+        <div>
+          <div className="text-xs text-muted-foreground mb-2 flex items-center gap-1">
+            <Cog className="h-3 w-3" />
+            Processes
+          </div>
+          <div className="flex flex-wrap gap-1">
+            <Badge 
+              variant={filters.processes.includes('CNC') ? 'default' : 'outline'} 
+              className="text-xs cursor-pointer hover:bg-primary/90"
+              onClick={() => toggleProcess('CNC')}
+            >
+              CNC ({filterCounts.processes['CNC'] || 0})
+            </Badge>
+            <Badge 
+              variant={filters.processes.includes('Molding') ? 'default' : 'outline'} 
+              className="text-xs cursor-pointer hover:bg-primary/90"
+              onClick={() => toggleProcess('Molding')}
+            >
+              Molding ({filterCounts.processes['Molding'] || 0})
+            </Badge>
+          </div>
+        </div>
+
+        {/* Materials */}
+        <div>
+          <div className="text-xs text-muted-foreground mb-2 flex items-center gap-1">
+            <Package className="h-3 w-3" />
+            Materials
+          </div>
+          <div className="flex flex-wrap gap-1">
+            <Badge 
+              variant={filters.materials.includes('Aluminum') ? 'default' : 'outline'} 
+              className="text-xs cursor-pointer hover:bg-primary/90"
+              onClick={() => toggleMaterial('Aluminum')}
+            >
+              Aluminum ({filterCounts.materials['Aluminum'] || 0})
+            </Badge>
+            <Badge 
+              variant={filters.materials.includes('Steel') ? 'default' : 'outline'} 
+              className="text-xs cursor-pointer hover:bg-primary/90"
+              onClick={() => toggleMaterial('Steel')}
+            >
+              Steel ({filterCounts.materials['Steel'] || 0})
+            </Badge>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
 
 function SourcingCopilot() {
   const location = useLocation();
@@ -232,45 +380,7 @@ function AppShellContent({ children, shortlist }: { children: React.ReactNode; s
           
           {state !== "collapsed" && (
             <div className="mt-8 p-4 bg-gradient-to-br from-muted/40 to-muted/60 rounded-lg border">
-              <h3 className="font-medium mb-3 flex items-center gap-2 text-sm">
-                <Filter className="h-4 w-4" />
-                Quick Filters
-              </h3>
-              <div className="space-y-3">
-                <div>
-                  <div className="text-xs text-muted-foreground mb-2 flex items-center gap-1">
-                    <Globe className="h-3 w-3" />
-                    Region Scope
-                  </div>
-                  <div className="flex flex-wrap gap-1">
-                    <Badge variant="default" className="text-xs bg-primary">DACH</Badge>
-                    <Badge variant="outline" className="text-xs">EU-27</Badge>
-                    <Badge variant="outline" className="text-xs">Global</Badge>
-                  </div>
-                </div>
-                
-                <div>
-                  <div className="text-xs text-muted-foreground mb-2 flex items-center gap-1">
-                    <Award className="h-3 w-3" />
-                    Certifications
-                  </div>
-                  <div className="flex flex-wrap gap-1">
-                    <Badge variant="secondary" className="text-xs">ISO 9001</Badge>
-                    <Badge variant="outline" className="text-xs">IATF 16949</Badge>
-                  </div>
-                </div>
-
-                <div>
-                  <div className="text-xs text-muted-foreground mb-2 flex items-center gap-1">
-                    <Cog className="h-3 w-3" />
-                    Processes
-                  </div>
-                  <div className="flex flex-wrap gap-1">
-                    <Badge variant="outline" className="text-xs">CNC</Badge>
-                    <Badge variant="outline" className="text-xs">Molding</Badge>
-                  </div>
-                </div>
-              </div>
+              <QuickFilters />
             </div>
           )}
         </SidebarContent>
