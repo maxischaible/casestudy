@@ -305,84 +305,86 @@ export default function Items() {
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
-            <table className="w-full border-collapse">
+            <table className="w-full border-collapse min-w-[800px]">
               <thead>
                 <tr className="border-b">
-                  <th className="text-left p-3">
-                    <Button variant="ghost" onClick={() => handleSort('part_number')} className="font-medium flex items-center gap-1">
+                  <th className="text-left p-2 w-32">
+                    <Button variant="ghost" onClick={() => handleSort('part_number')} className="font-medium flex items-center gap-1 text-xs">
                       Part Number {getSortIcon('part_number')}
                     </Button>
                   </th>
-                  <th className="text-left p-3">
-                    <Button variant="ghost" onClick={() => handleSort('description')} className="font-medium flex items-center gap-1">
+                  <th className="text-left p-2 w-48">
+                    <Button variant="ghost" onClick={() => handleSort('description')} className="font-medium flex items-center gap-1 text-xs">
                       Description {getSortIcon('description')}
                     </Button>
                   </th>
-                  <th className="text-left p-3">
-                    <Button variant="ghost" onClick={() => handleSort('category')} className="font-medium flex items-center gap-1">
+                  <th className="text-left p-2 w-28">
+                    <Button variant="ghost" onClick={() => handleSort('category')} className="font-medium flex items-center gap-1 text-xs">
                       Category {getSortIcon('category')}
                     </Button>
                   </th>
-                  <th className="text-left p-3">
-                    <Button variant="ghost" onClick={() => handleSort('current_supplier')} className="font-medium flex items-center gap-1">
+                  <th className="text-left p-2 w-36">
+                    <Button variant="ghost" onClick={() => handleSort('current_supplier')} className="font-medium flex items-center gap-1 text-xs">
                       Supplier {getSortIcon('current_supplier')}
                     </Button>
                   </th>
-                  <th className="text-left p-3">
-                    <Button variant="ghost" onClick={() => handleSort('status')} className="font-medium flex items-center gap-1">
+                  <th className="text-left p-2 w-20">
+                    <Button variant="ghost" onClick={() => handleSort('status')} className="font-medium flex items-center gap-1 text-xs">
                       Status {getSortIcon('status')}
                     </Button>
                   </th>
-                  <th className="text-left p-3">
-                    <Button variant="ghost" onClick={() => handleSort('criticality')} className="font-medium flex items-center gap-1">
-                      Criticality {getSortIcon('criticality')}
+                  <th className="text-left p-2 w-16">
+                    <Button variant="ghost" onClick={() => handleSort('criticality')} className="font-medium flex items-center gap-1 text-xs">
+                      Crit. {getSortIcon('criticality')}
                     </Button>
                   </th>
-                  <th className="text-left p-3">
-                    <Button variant="ghost" onClick={() => handleSort('total_value')} className="font-medium flex items-center gap-1">
+                  <th className="text-left p-2 w-28">
+                    <Button variant="ghost" onClick={() => handleSort('total_value')} className="font-medium flex items-center gap-1 text-xs">
                       Annual Value {getSortIcon('total_value')}
                     </Button>
                   </th>
-                  <th className="text-left p-3">Actions</th>
+                  <th className="text-left p-2 w-20">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredAndSortedItems.map((item) => (
                   <tr key={item.id} className="border-b hover:bg-muted/50">
-                    <td className="p-3 font-medium">{item.part_number}</td>
-                    <td className="p-3 max-w-xs">
-                      <div className="truncate" title={item.description}>
+                    <td className="p-2 font-medium text-xs">{item.part_number}</td>
+                    <td className="p-2 w-48">
+                      <div className="truncate text-xs" title={item.description}>
                         {item.description}
                       </div>
-                      <div className="text-xs text-muted-foreground">
+                      <div className="text-xs text-muted-foreground truncate">
                         {item.material} • {item.process}
                       </div>
                     </td>
-                    <td className="p-3">{item.category}</td>
-                    <td className="p-3">{item.current_supplier}</td>
-                    <td className="p-3">{getStatusBadge(item.status)}</td>
-                    <td className="p-3">{getCriticalityBadge(item.criticality)}</td>
-                    <td className="p-3">
-                      <div className="font-medium">{formatCurrency(item.total_value)}</div>
+                    <td className="p-2 text-xs">{item.category.split(' ')[0]}</td>
+                    <td className="p-2 text-xs truncate" title={item.current_supplier}>{item.current_supplier}</td>
+                    <td className="p-2">{getStatusBadge(item.status)}</td>
+                    <td className="p-2">{getCriticalityBadge(item.criticality)}</td>
+                    <td className="p-2">
+                      <div className="font-medium text-xs">{formatCurrency(item.total_value)}</div>
                       <div className="text-xs text-muted-foreground">
-                        {item.annual_volume.toLocaleString()} units
+                        {item.annual_volume > 1000 ? `${Math.round(item.annual_volume/1000)}k` : item.annual_volume} units
                       </div>
                     </td>
-                    <td className="p-3">
+                    <td className="p-2">
                       <div className="flex gap-1">
                         <Button 
                           variant="ghost" 
                           size="sm" 
                           onClick={() => handleViewDetails(item)}
+                          className="h-6 w-6 p-0"
                         >
-                          <Eye className="h-4 w-4" />
+                          <Eye className="h-3 w-3" />
                         </Button>
                         <Button 
                           variant="ghost" 
                           size="sm" 
                           onClick={() => handleEditItem(item)}
+                          className="h-6 w-6 p-0"
                         >
-                          <Edit className="h-4 w-4" />
+                          <Edit className="h-3 w-3" />
                         </Button>
                       </div>
                     </td>

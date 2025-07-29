@@ -152,7 +152,7 @@ export default function AppShell({ children }: AppShellProps) {
   
   return (
     <SidebarProvider open={open} onOpenChange={setOpen}>
-    <div className="min-h-screen flex w-full bg-background">
+    <div className="min-h-screen flex w-full bg-background overflow-x-hidden">
       <AppShellContent shortlist={shortlist} setOpen={setOpen}>
         {children}
       </AppShellContent>

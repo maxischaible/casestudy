@@ -345,106 +345,109 @@ export default function Suppliers() {
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
-            <table className="w-full border-collapse">
+            <table className="w-full border-collapse min-w-[900px]">
               <thead>
                 <tr className="border-b">
-                  <th className="text-left p-3">
-                    <Button variant="ghost" onClick={() => handleSort('name')} className="font-medium flex items-center gap-1">
+                  <th className="text-left p-2 w-48">
+                    <Button variant="ghost" onClick={() => handleSort('name')} className="font-medium flex items-center gap-1 text-xs">
                       Supplier Name {getSortIcon('name')}
                     </Button>
                   </th>
-                  <th className="text-left p-3">
-                    <Button variant="ghost" onClick={() => handleSort('country')} className="font-medium flex items-center gap-1">
+                  <th className="text-left p-2 w-24">
+                    <Button variant="ghost" onClick={() => handleSort('country')} className="font-medium flex items-center gap-1 text-xs">
                       Location {getSortIcon('country')}
                     </Button>
                   </th>
-                  <th className="text-left p-3">
-                    <Button variant="ghost" onClick={() => handleSort('relationship_status')} className="font-medium flex items-center gap-1">
+                  <th className="text-left p-2 w-24">
+                    <Button variant="ghost" onClick={() => handleSort('relationship_status')} className="font-medium flex items-center gap-1 text-xs">
                       Status {getSortIcon('relationship_status')}
                     </Button>
                   </th>
-                  <th className="text-left p-3">
-                    <Button variant="ghost" onClick={() => handleSort('performance_score')} className="font-medium flex items-center gap-1">
-                      Performance {getSortIcon('performance_score')}
+                  <th className="text-left p-2 w-20">
+                    <Button variant="ghost" onClick={() => handleSort('performance_score')} className="font-medium flex items-center gap-1 text-xs">
+                      Perf. {getSortIcon('performance_score')}
                     </Button>
                   </th>
-                  <th className="text-left p-3">
-                    <Button variant="ghost" onClick={() => handleSort('quality_rating')} className="font-medium flex items-center gap-1">
+                  <th className="text-left p-2 w-20">
+                    <Button variant="ghost" onClick={() => handleSort('quality_rating')} className="font-medium flex items-center gap-1 text-xs">
                       Quality {getSortIcon('quality_rating')}
                     </Button>
                   </th>
-                  <th className="text-left p-3">
-                    <Button variant="ghost" onClick={() => handleSort('total_annual_spend')} className="font-medium flex items-center gap-1">
+                  <th className="text-left p-2 w-28">
+                    <Button variant="ghost" onClick={() => handleSort('total_annual_spend')} className="font-medium flex items-center gap-1 text-xs">
                       Annual Spend {getSortIcon('total_annual_spend')}
                     </Button>
                   </th>
-                  <th className="text-left p-3">
-                    <Button variant="ghost" onClick={() => handleSort('risk_level')} className="font-medium flex items-center gap-1">
+                  <th className="text-left p-2 w-20">
+                    <Button variant="ghost" onClick={() => handleSort('risk_level')} className="font-medium flex items-center gap-1 text-xs">
                       Risk {getSortIcon('risk_level')}
                     </Button>
                   </th>
-                  <th className="text-left p-3">Actions</th>
+                  <th className="text-left p-2 w-24">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredAndSortedSuppliers.map((supplier) => (
                   <tr key={supplier.id} className="border-b hover:bg-muted/50">
-                    <td className="p-3">
-                      <div className="font-medium">{supplier.name}</div>
-                      <div className="text-xs text-muted-foreground flex items-center gap-2">
-                        <span>{supplier.contact_person}</span>
+                    <td className="p-2">
+                      <div className="font-medium text-xs truncate" title={supplier.name}>{supplier.name}</div>
+                      <div className="text-xs text-muted-foreground flex items-center gap-1">
+                        <span className="truncate">{supplier.contact_person}</span>
                         <span>•</span>
                         <span>{supplier.items_count} items</span>
                       </div>
                     </td>
-                    <td className="p-3">
+                    <td className="p-2">
                       <div className="flex items-center gap-1">
-                        <MapPin className="h-3 w-3 text-muted-foreground" />
-                        <span>{supplier.city}, {supplier.country}</span>
+                        <MapPin className="h-3 w-3 text-muted-foreground flex-shrink-0" />
+                        <span className="text-xs truncate">{supplier.city}, {supplier.country}</span>
                       </div>
                     </td>
-                    <td className="p-3">{getStatusBadge(supplier.relationship_status)}</td>
-                    <td className="p-3">
+                    <td className="p-2">{getStatusBadge(supplier.relationship_status)}</td>
+                    <td className="p-2">
                       <div className="space-y-1">
-                        <div className="flex items-center gap-2">
-                          <span className="text-sm font-medium">{supplier.performance_score}%</span>
+                        <div className="flex items-center gap-1">
+                          <span className="text-xs font-medium">{supplier.performance_score}%</span>
                         </div>
-                        <Progress value={supplier.performance_score} className="h-2 w-16" />
+                        <Progress value={supplier.performance_score} className="h-1 w-12" />
                       </div>
                     </td>
-                    <td className="p-3">{renderStars(supplier.quality_rating)}</td>
-                    <td className="p-3">
-                      <div className="font-medium">{formatCurrency(supplier.total_annual_spend)}</div>
-                      <div className="text-xs text-muted-foreground">
+                    <td className="p-2">{renderStars(supplier.quality_rating)}</td>
+                    <td className="p-2">
+                      <div className="font-medium text-xs">{formatCurrency(supplier.total_annual_spend)}</div>
+                      <div className="text-xs text-muted-foreground truncate">
                         {supplier.payment_terms}
                       </div>
                     </td>
-                    <td className="p-3">{getRiskBadge(supplier.risk_level)}</td>
-                    <td className="p-3">
+                    <td className="p-2">{getRiskBadge(supplier.risk_level)}</td>
+                    <td className="p-2">
                       <div className="flex gap-1">
                         <Button 
                           variant="ghost" 
                           size="sm" 
                           onClick={() => handleViewDetails(supplier)}
                           title="View Details"
+                          className="h-6 w-6 p-0"
                         >
-                          <Eye className="h-4 w-4" />
+                          <Eye className="h-3 w-3" />
                         </Button>
                         <Button 
                           variant="ghost" 
                           size="sm" 
                           onClick={() => handleContactSupplier(supplier)}
                           title="Contact Supplier"
+                          className="h-6 w-6 p-0"
                         >
-                          <Mail className="h-4 w-4" />
+                          <Mail className="h-3 w-3" />
                         </Button>
                         <Button 
                           variant="ghost" 
                           size="sm" 
                           onClick={() => handleEditSupplier(supplier)}
                           title="Edit Supplier"
+                          className="h-6 w-6 p-0"
                         >
-                          <Edit className="h-4 w-4" />
+                          <Edit className="h-3 w-3" />
                         </Button>
                       </div>
                     </td>
