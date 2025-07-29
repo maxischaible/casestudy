@@ -22,9 +22,11 @@ import {
 import { getItems } from '@/data/seed';
 import { Item } from '@/types/domain';
 import { useToast } from '@/hooks/use-toast';
+import { useNavigate } from 'react-router-dom';
 
 export default function Items() {
   const { toast } = useToast();
+  const navigate = useNavigate();
   const [items] = useState<Item[]>(getItems());
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
@@ -119,10 +121,7 @@ export default function Items() {
   };
 
   const handleViewDetails = (item: Item) => {
-    toast({
-      title: "Item Details",
-      description: `Viewing details for ${item.part_number}`
-    });
+    navigate(`/item/${item.id}`);
   };
 
   const handleEditItem = (item: Item) => {

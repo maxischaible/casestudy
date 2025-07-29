@@ -11,6 +11,7 @@ import Search from "./pages/Search";
 import Items from "./pages/Items";
 import Suppliers from "./pages/Suppliers";
 import SupplierProfile from "./pages/SupplierProfile";
+import ItemDetail from "./pages/ItemDetail";
 import Compare from "./pages/Compare";
 import ImportBOM from "./pages/ImportBOM";
 import Admin from "./pages/Admin";
@@ -33,6 +34,7 @@ const App = () => (
               <Route path="/items" element={<Items />} />
               <Route path="/suppliers" element={<Suppliers />} />
               <Route path="/supplier/:id" element={<SupplierProfile />} />
+              <Route path="/item/:id" element={<ItemDetail />} />
               <Route path="/compare" element={<Compare />} />
               <Route path="/import" element={<ImportBOM />} />
               <Route path="/admin" element={<Admin />} />
