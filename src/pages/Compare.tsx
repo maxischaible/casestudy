@@ -1,0 +1,333 @@
+import { useState } from 'react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { useToast } from '@/hooks/use-toast';
+import { Download, Mail, X, Eye } from 'lucide-react';
+import { getShortlist, removeFromShortlist } from '@/lib/storage';
+import { exportShortlistToPDF } from '@/lib/pdf';
+import { generateRFIEmail, copyRFIToClipboard } from '@/lib/rfi';
+import { samplePartSpecs } from '@/data/seed';
+import { useNavigate } from 'react-router-dom';
+
+export default function Compare() {
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const [shortlist, setShortlist] = useState(getShortlist());
+
+  const handleRemoveFromShortlist = (supplierId: string) => {
+    removeFromShortlist(supplierId);
+    setShortlist(getShortlist());
+    toast({
+      title: "Removed from Shortlist",
+      description: "Supplier has been removed from comparison."
+    });
+  };
+
+  const handleExportPDF = () => {
+    if (shortlist.length === 0) {
+      toast({
+        title: "No Suppliers",
+        description: "Add suppliers to your shortlist first.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Convert suppliers to match results for PDF export
+    const mockResults = shortlist.map(supplier => ({
+      supplier,
+      switching_cost_score: 75 + Math.floor(Math.random() * 20),
+      estimated_savings_rate: Math.random() * 0.25,
+      audit_readiness: 'Audit-ready' as const,
+      reasons: [`Strong process match`, `Excellent certifications`]
+    }));
+
+    exportShortlistToPDF(mockResults);
+    toast({
+      title: "PDF Exported",
+      description: "Shortlist comparison has been downloaded."
+    });
+  };
+
+  const handleGenerateRFI = async () => {
+    if (shortlist.length === 0) {
+      toast({
+        title: "No Suppliers",
+        description: "Add suppliers to your shortlist first.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const demoPartSpec = samplePartSpecs()[0];
+    const mockResults = shortlist.map(supplier => ({
+      supplier,
+      switching_cost_score: 75 + Math.floor(Math.random() * 20),
+      estimated_savings_rate: Math.random() * 0.25,
+      audit_readiness: 'Audit-ready' as const,
+      reasons: [`Strong process match`, `Excellent certifications`]
+    }));
+
+    const rfiContent = generateRFIEmail(demoPartSpec, mockResults);
+    
+    try {
+      await copyRFIToClipboard(rfiContent);
+      toast({
+        title: "RFI Copied",
+        description: "RFI email has been copied to clipboard."
+      });
+    } catch (error) {
+      toast({
+        title: "Copy Failed",
+        description: "Please copy the RFI content manually.",
+        variant: "destructive"
+      });
+    }
+  };
+
+  if (shortlist.length === 0) {
+    return (
+      <div className="max-w-4xl mx-auto">
+        <h1 className="text-3xl font-bold mb-6">Compare Suppliers</h1>
+        <Card>
+          <CardContent className="text-center py-12">
+            <p className="text-muted-foreground mb-4">
+              Your shortlist is empty. Add suppliers from the search results to compare them.
+            </p>
+            <Button onClick={() => navigate('/search')}>
+              Search Suppliers
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  return (
+    <div className="max-w-7xl mx-auto space-y-6">
+      <div className="flex justify-between items-center">
+        <h1 className="text-3xl font-bold">Compare Suppliers</h1>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={handleExportPDF}>
+            <Download className="h-4 w-4 mr-2" />
+            Export PDF
+          </Button>
+          <Button onClick={handleGenerateRFI}>
+            <Mail className="h-4 w-4 mr-2" />
+            Generate RFI
+          </Button>
+        </div>
+      </div>
+
+      <div className="grid gap-6">
+        {/* Comparison Table */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Supplier Comparison</CardTitle>
+            <CardDescription>
+              Side-by-side comparison of {shortlist.length} selected suppliers
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr className="border-b">
+                    <th className="text-left p-4 font-medium">Metric</th>
+                    {shortlist.map((supplier) => (
+                      <th key={supplier.id} className="text-left p-4 font-medium min-w-[200px]">
+                        <div className="flex items-center justify-between">
+                          {supplier.name}
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleRemoveFromShortlist(supplier.id)}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr className="border-b">
+                    <td className="p-4 font-medium">Location</td>
+                    {shortlist.map((supplier) => (
+                      <td key={supplier.id} className="p-4">
+                        {supplier.city}, {supplier.country}
+                      </td>
+                    ))}
+                  </tr>
+                  
+                  <tr className="border-b">
+                    <td className="p-4 font-medium">Certifications</td>
+                    {shortlist.map((supplier) => (
+                      <td key={supplier.id} className="p-4">
+                        <div className="flex flex-wrap gap-1">
+                          {supplier.certifications.slice(0, 3).map((cert) => (
+                            <Badge key={cert.code} variant="secondary" className="text-xs">
+                              {cert.code}
+                            </Badge>
+                          ))}
+                          {supplier.certifications.length > 3 && (
+                            <Badge variant="outline" className="text-xs">
+                              +{supplier.certifications.length - 3}
+                            </Badge>
+                          )}
+                        </div>
+                      </td>
+                    ))}
+                  </tr>
+                  
+                  <tr className="border-b">
+                    <td className="p-4 font-medium">Lead Time</td>
+                    {shortlist.map((supplier) => (
+                      <td key={supplier.id} className="p-4">
+                        {supplier.lead_time_days} days
+                      </td>
+                    ))}
+                  </tr>
+                  
+                  <tr className="border-b">
+                    <td className="p-4 font-medium">MOQ</td>
+                    {shortlist.map((supplier) => (
+                      <td key={supplier.id} className="p-4">
+                        {supplier.moq.toLocaleString()}
+                      </td>
+                    ))}
+                  </tr>
+                  
+                  <tr className="border-b">
+                    <td className="p-4 font-medium">Price Index</td>
+                    {shortlist.map((supplier) => (
+                      <td key={supplier.id} className="p-4">
+                        <Badge variant={supplier.price_index < 1.0 ? "default" : "secondary"}>
+                          {supplier.price_index.toFixed(2)}x
+                        </Badge>
+                      </td>
+                    ))}
+                  </tr>
+                  
+                  <tr className="border-b">
+                    <td className="p-4 font-medium">On-Time Rate</td>
+                    {shortlist.map((supplier) => (
+                      <td key={supplier.id} className="p-4">
+                        <div className="space-y-2">
+                          <span className="text-sm">{(supplier.quality.on_time_rate * 100).toFixed(1)}%</span>
+                          <Progress value={supplier.quality.on_time_rate * 100} className="h-2" />
+                        </div>
+                      </td>
+                    ))}
+                  </tr>
+                  
+                  <tr className="border-b">
+                    <td className="p-4 font-medium">Defect Rate</td>
+                    {shortlist.map((supplier) => (
+                      <td key={supplier.id} className="p-4">
+                        {supplier.quality.defect_rate_ppm} PPM
+                      </td>
+                    ))}
+                  </tr>
+                  
+                  <tr className="border-b">
+                    <td className="p-4 font-medium">Capacity</td>
+                    {shortlist.map((supplier) => (
+                      <td key={supplier.id} className="p-4">
+                        {supplier.capacity.value.toLocaleString()} {supplier.capacity.unit}
+                      </td>
+                    ))}
+                  </tr>
+                  
+                  <tr>
+                    <td className="p-4 font-medium">Actions</td>
+                    {shortlist.map((supplier) => (
+                      <td key={supplier.id} className="p-4">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => navigate(`/supplier/${supplier.id}`)}
+                        >
+                          <Eye className="h-4 w-4 mr-2" />
+                          View Details
+                        </Button>
+                      </td>
+                    ))}
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Summary Cards */}
+        <div className="grid md:grid-cols-3 gap-4">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Best Price</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {(() => {
+                const best = shortlist.reduce((prev, current) => 
+                  (prev.price_index < current.price_index) ? prev : current
+                );
+                return (
+                  <div>
+                    <p className="font-medium">{best.name}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {best.price_index.toFixed(2)}x price index
+                    </p>
+                  </div>
+                );
+              })()}
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Fastest Delivery</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {(() => {
+                const fastest = shortlist.reduce((prev, current) => 
+                  (prev.lead_time_days < current.lead_time_days) ? prev : current
+                );
+                return (
+                  <div>
+                    <p className="font-medium">{fastest.name}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {fastest.lead_time_days} days lead time
+                    </p>
+                  </div>
+                );
+              })()}
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg">Best Quality</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {(() => {
+                const bestQuality = shortlist.reduce((prev, current) => 
+                  (prev.quality.on_time_rate > current.quality.on_time_rate) ? prev : current
+                );
+                return (
+                  <div>
+                    <p className="font-medium">{bestQuality.name}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {(bestQuality.quality.on_time_rate * 100).toFixed(1)}% on-time rate
+                    </p>
+                  </div>
+                );
+              })()}
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    </div>
+  );
+}
