@@ -170,8 +170,8 @@ function AppShellContent({ children, shortlist, setOpen }: { children: React.Rea
               onClick={() => setOpen(true)}
               className="flex items-center gap-3 hover:bg-muted/50 rounded-lg p-1 transition-colors flex-1"
             >
-              <div className="w-4 h-4 flex items-center justify-center flex-shrink-0">
-                <svg width="16" height="16" viewBox="0 0 40.36 42" xmlns="http://www.w3.org/2000/svg">
+              <div className="w-6 h-6 flex items-center justify-center flex-shrink-0">
+                <svg width="24" height="24" viewBox="0 0 40.36 42" xmlns="http://www.w3.org/2000/svg">
                   <path 
                     fillRule="evenodd" 
                     clipRule="evenodd" 
