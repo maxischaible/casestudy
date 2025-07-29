@@ -267,92 +267,31 @@ export default function Suppliers() {
         </Card>
       </div>
 
-      {/* Filters and Search */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Filter className="h-5 w-5" />
-            Filters & Search
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Search</label>
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search suppliers..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-9"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Status</label>
-              <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger>
-                  <SelectValue placeholder="All statuses" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Statuses</SelectItem>
-                  {uniqueStatuses.map(status => (
-                    <SelectItem key={status} value={status}>{status}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Country</label>
-              <Select value={countryFilter} onValueChange={setCountryFilter}>
-                <SelectTrigger>
-                  <SelectValue placeholder="All countries" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Countries</SelectItem>
-                  {uniqueCountries.map(country => (
-                    <SelectItem key={country} value={country}>{country}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Risk Level</label>
-              <Select value={riskFilter} onValueChange={setRiskFilter}>
-                <SelectTrigger>
-                  <SelectValue placeholder="All risk levels" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Risk Levels</SelectItem>
-                  {uniqueRiskLevels.map(risk => (
-                    <SelectItem key={risk} value={risk}>{risk} Risk</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Actions</label>
-              <Button 
-                variant="outline" 
-                onClick={() => {
-                  setSearchTerm('');
-                  setStatusFilter('all');
-                  setCountryFilter('all');
-                  setRiskFilter('all');
-                }}
-                className="w-full"
-              >
-                Clear Filters
-              </Button>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Search Bar */}
+      <div className="flex items-center gap-4">
+        <div className="relative flex-1 max-w-md">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search suppliers..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-9"
+          />
+        </div>
+        {(searchTerm || activeFiltersCount > 0) && (
+          <Button 
+            variant="outline" 
+            onClick={() => {
+              setSearchTerm('');
+              setStatusFilter('all');
+              setCountryFilter('all');
+              setRiskFilter('all');
+            }}
+          >
+            Clear All
+          </Button>
+        )}
+      </div>
 
       {/* Active Filters */}
       {activeFiltersCount > 0 && (
