@@ -6,7 +6,6 @@ import { useToast } from '@/hooks/use-toast';
 import { RefreshCw, Trash2, Database, Users, Download } from 'lucide-react';
 import { generateSuppliers, getSuppliers } from '@/data/seed';
 import { clearShortlist, getShortlist } from '@/lib/storage';
-import SupplierGeographicMap from '@/components/SupplierGeographicMap';
 
 export default function Admin() {
   const { toast } = useToast();
@@ -216,13 +215,10 @@ export default function Admin() {
         </Card>
       </div>
 
-      {/* Enhanced Geographic Distribution with Heat Map */}
-      <SupplierGeographicMap />
-
-      {/* Country Distribution - Simplified */}
+      {/* Country Distribution */}
       <Card>
         <CardHeader>
-          <CardTitle>Top Countries by Supplier Count</CardTitle>
+          <CardTitle>Geographic Distribution</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid md:grid-cols-6 gap-4">
