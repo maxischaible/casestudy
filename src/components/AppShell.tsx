@@ -8,7 +8,9 @@ import {
   Settings, 
   Bot,
   MessageSquare,
-  Award
+  Award,
+  Package,
+  Users
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -22,6 +24,8 @@ interface AppShellProps {
 
 const navigation = [
   { name: 'Search & Match', href: '/search', icon: Search },
+  { name: 'Items', href: '/items', icon: Package },
+  { name: 'Suppliers', href: '/suppliers', icon: Users },
   { name: 'Compare', href: '/compare', icon: GitCompare },
   { name: 'Import BOM', href: '/import', icon: Upload },
   { name: 'Admin', href: '/admin', icon: Settings },

@@ -45,3 +45,50 @@ export interface MatchResult {
   audit_readiness: 'Audit-ready' | 'Minor gaps' | 'Major gaps';
   reasons: string[];              // human-readable match explanations
 }
+
+// Additional types for Items and Suppliers pages
+export interface Item {
+  id: string;
+  part_number: string;
+  description: string;
+  category: string;
+  material: string;
+  process: string;
+  current_supplier: string;
+  supplier_id?: string;
+  annual_volume: number;
+  unit_price: number;
+  total_value: number;
+  criticality: 'A' | 'B' | 'C';
+  last_order_date: string;
+  next_order_date: string;
+  status: 'Active' | 'EOL' | 'Planned' | 'On Hold';
+  lead_time_days: number;
+  moq: number;
+  drawings_available: boolean;
+  tooling_required: boolean;
+}
+
+export interface CompanySupplier {
+  id: string;
+  name: string;
+  country: string;
+  city: string;
+  contact_person: string;
+  email: string;
+  phone?: string;
+  categories: string[];
+  relationship_status: 'Active' | 'Preferred' | 'Qualified' | 'Under Review' | 'Inactive';
+  total_annual_spend: number;
+  items_count: number;
+  performance_score: number; // 0-100
+  quality_rating: number; // 0-5
+  delivery_rating: number; // 0-5
+  communication_rating: number; // 0-5
+  last_audit_date?: string;
+  next_audit_date?: string;
+  certifications: Certification[];
+  risk_level: 'Low' | 'Medium' | 'High';
+  payment_terms: string;
+  established_date: string;
+}

@@ -8,6 +8,8 @@ import { FilterProvider } from "@/contexts/FilterContext";
 import AppShell from "./components/AppShell";
 import Demo from "./pages/Demo";
 import Search from "./pages/Search";
+import Items from "./pages/Items";
+import Suppliers from "./pages/Suppliers";
 import SupplierProfile from "./pages/SupplierProfile";
 import Compare from "./pages/Compare";
 import ImportBOM from "./pages/ImportBOM";
@@ -28,6 +30,8 @@ const App = () => (
               <Route path="/" element={<Demo />} />
               <Route path="/demo" element={<Demo />} />
               <Route path="/search" element={<Search />} />
+              <Route path="/items" element={<Items />} />
+              <Route path="/suppliers" element={<Suppliers />} />
               <Route path="/supplier/:id" element={<SupplierProfile />} />
               <Route path="/compare" element={<Compare />} />
               <Route path="/import" element={<ImportBOM />} />

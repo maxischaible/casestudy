@@ -336,3 +336,103 @@ export function samplePartSpecs(): PartSpec[] {
     }
   ];
 }
+
+// Mock data for Items page
+import { Item, CompanySupplier } from '@/types/domain';
+
+const ITEM_CATEGORIES = [
+  'Brackets & Housings',
+  'Mechanical Components', 
+  'Electronic Components',
+  'Fasteners',
+  'Gaskets & Seals',
+  'Wire Harnesses'
+];
+
+const SUPPLIERS_DATA = [
+  'Precision Tech GmbH',
+  'Alpine Manufacturing',
+  'Nordic Components',
+  'Bavarian Machining',
+  'Czech Precision Parts',
+  'Polish Metalworks',
+  'Italian Casting Co.',
+  'French Assembly Solutions',
+  'Dutch Engineering Works',
+  'Swedish Quality Parts'
+];
+
+export function getItems(): Item[] {
+  const items: Item[] = [];
+  
+  for (let i = 1; i <= 150; i++) {
+    const category = ITEM_CATEGORIES[Math.floor(Math.random() * ITEM_CATEGORIES.length)];
+    const material = MATERIALS[Math.floor(Math.random() * MATERIALS.length)];
+    const process = PROCESSES[Math.floor(Math.random() * PROCESSES.length)];
+    const supplier = SUPPLIERS_DATA[Math.floor(Math.random() * SUPPLIERS_DATA.length)];
+    const volume = Math.floor(Math.random() * 50000) + 1000;
+    const unitPrice = Math.random() * 100 + 5;
+    
+    items.push({
+      id: `ITM-${String(i).padStart(4, '0')}`,
+      part_number: `P${String(i).padStart(6, '0')}-${Math.floor(Math.random() * 900) + 100}`,
+      description: `${category.split(' ')[0]} component for automotive application`,
+      category,
+      material,
+      process,
+      current_supplier: supplier,
+      supplier_id: `SUP-${String(Math.floor(Math.random() * 50) + 1).padStart(3, '0')}`,
+      annual_volume: volume,
+      unit_price: unitPrice,
+      total_value: volume * unitPrice,
+      criticality: ['A', 'B', 'C'][Math.floor(Math.random() * 3)] as 'A' | 'B' | 'C',
+      last_order_date: new Date(Date.now() - Math.random() * 90 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      next_order_date: new Date(Date.now() + Math.random() * 180 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      status: ['Active', 'EOL', 'Planned', 'On Hold'][Math.floor(Math.random() * 4)] as any,
+      lead_time_days: Math.floor(Math.random() * 60) + 7,
+      moq: Math.floor(Math.random() * 1000) + 100,
+      drawings_available: Math.random() > 0.3,
+      tooling_required: Math.random() > 0.6
+    });
+  }
+  
+  return items;
+}
+
+export function getCompanySuppliers(): CompanySupplier[] {
+  const suppliers: CompanySupplier[] = [];
+  
+  for (let i = 1; i <= 50; i++) {
+    const country = EU_COUNTRIES[Math.floor(Math.random() * EU_COUNTRIES.length)];
+    const city = CITIES_BY_COUNTRY[country][Math.floor(Math.random() * CITIES_BY_COUNTRY[country].length)];
+    const categories = CATEGORIES.slice(0, Math.floor(Math.random() * 3) + 1);
+    const annualSpend = Math.random() * 2000000 + 50000;
+    const itemsCount = Math.floor(Math.random() * 25) + 1;
+    
+    suppliers.push({
+      id: `SUP-${String(i).padStart(3, '0')}`,
+      name: SUPPLIERS_DATA[Math.floor(Math.random() * SUPPLIERS_DATA.length)] + ` ${i}`,
+      country,
+      city,
+      contact_person: `${['Klaus', 'Hans', 'Stefan', 'Michael', 'Andreas', 'Thomas'][Math.floor(Math.random() * 6)]} ${['Mueller', 'Schmidt', 'Weber', 'Fischer', 'Wagner'][Math.floor(Math.random() * 5)]}`,
+      email: `contact${i}@supplier${i}.com`,
+      phone: `+49 ${Math.floor(Math.random() * 900) + 100} ${Math.floor(Math.random() * 9000) + 1000}`,
+      categories,
+      relationship_status: ['Active', 'Preferred', 'Qualified', 'Under Review', 'Inactive'][Math.floor(Math.random() * 5)] as any,
+      total_annual_spend: annualSpend,
+      items_count: itemsCount,
+      performance_score: Math.floor(Math.random() * 40) + 60,
+      quality_rating: Math.random() * 2 + 3,
+      delivery_rating: Math.random() * 2 + 3,
+      communication_rating: Math.random() * 2 + 3,
+      last_audit_date: Math.random() > 0.3 ? new Date(Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] : undefined,
+      next_audit_date: Math.random() > 0.5 ? new Date(Date.now() + Math.random() * 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] : undefined,
+      certifications: [generateCertification('ISO9001'), generateCertification('IATF16949')].slice(0, Math.floor(Math.random() * 3) + 1),
+      risk_level: ['Low', 'Medium', 'High'][Math.floor(Math.random() * 3)] as any,
+      payment_terms: ['Net 30', 'Net 45', 'Net 60', '2/10 Net 30'][Math.floor(Math.random() * 4)],
+      established_date: new Date(Date.now() - Math.random() * 10 * 365 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]
+    });
+  }
+  
+  return suppliers;
+}
