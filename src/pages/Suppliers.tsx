@@ -19,7 +19,8 @@ import {
   Users,
   MapPin,
   Phone,
-  Mail
+  Mail,
+  X
 } from 'lucide-react';
 import { getCompanySuppliers } from '@/data/seed';
 import { CompanySupplier } from '@/types/domain';
@@ -171,11 +172,29 @@ export default function Suppliers() {
     window.open(`mailto:${supplier.email}?subject=Inquiry from tacto Sourcing Platform`);
   };
 
+  // Quick filter handlers
+  const handleQuickFilterRemove = (filterType: 'status' | 'country' | 'risk', value?: string) => {
+    switch (filterType) {
+      case 'status':
+        setStatusFilter('all');
+        break;
+      case 'country':
+        setCountryFilter('all');
+        break;
+      case 'risk':
+        setRiskFilter('all');
+        break;
+    }
+  };
+
   // Calculate summary statistics
   const totalSpend = filteredAndSortedSuppliers.reduce((sum, supplier) => sum + supplier.total_annual_spend, 0);
   const activeSuppliers = filteredAndSortedSuppliers.filter(supplier => supplier.relationship_status === 'Active').length;
   const preferredSuppliers = filteredAndSortedSuppliers.filter(supplier => supplier.relationship_status === 'Preferred').length;
   const avgPerformance = filteredAndSortedSuppliers.reduce((sum, supplier) => sum + supplier.performance_score, 0) / filteredAndSortedSuppliers.length;
+
+  // Active filters count
+  const activeFiltersCount = [statusFilter, countryFilter, riskFilter].filter(f => f !== 'all').length;
 
   return (
     <div className="max-w-7xl mx-auto space-y-6">
@@ -335,12 +354,65 @@ export default function Suppliers() {
         </CardContent>
       </Card>
 
+      {/* Active Filters */}
+      {activeFiltersCount > 0 && (
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-sm font-medium">Active filters:</span>
+          {statusFilter !== 'all' && (
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => handleQuickFilterRemove('status')}
+              className="gap-2 h-7"
+            >
+              Status: {statusFilter}
+              <X className="h-3 w-3" />
+            </Button>
+          )}
+          {countryFilter !== 'all' && (
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => handleQuickFilterRemove('country')}
+              className="gap-2 h-7"
+            >
+              Country: {countryFilter}
+              <X className="h-3 w-3" />
+            </Button>
+          )}
+          {riskFilter !== 'all' && (
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => handleQuickFilterRemove('risk')}
+              className="gap-2 h-7"
+            >
+              Risk: {riskFilter}
+              <X className="h-3 w-3" />
+            </Button>
+          )}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              setStatusFilter('all');
+              setCountryFilter('all');
+              setRiskFilter('all');
+            }}
+            className="text-muted-foreground h-7"
+          >
+            Clear all
+          </Button>
+        </div>
+      )}
+
       {/* Suppliers Table */}
       <Card>
         <CardHeader>
           <CardTitle>Suppliers List</CardTitle>
           <CardDescription>
             {filteredAndSortedSuppliers.length} of {suppliers.length} suppliers shown
+            {activeFiltersCount > 0 && <span className="text-primary"> • {activeFiltersCount} filter{activeFiltersCount > 1 ? 's' : ''} applied</span>}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -397,13 +469,27 @@ export default function Suppliers() {
                         <span>{supplier.items_count} items</span>
                       </div>
                     </td>
+                     <td className="p-2">
+                       <Button
+                         variant="ghost"
+                         size="sm"
+                         onClick={() => setCountryFilter(supplier.country)}
+                         className="p-0 h-auto flex items-center gap-1"
+                       >
+                         <MapPin className="h-3 w-3 text-muted-foreground flex-shrink-0" />
+                         <span className="text-xs truncate">{supplier.city}, {supplier.country}</span>
+                       </Button>
+                     </td>
                     <td className="p-2">
-                      <div className="flex items-center gap-1">
-                        <MapPin className="h-3 w-3 text-muted-foreground flex-shrink-0" />
-                        <span className="text-xs truncate">{supplier.city}, {supplier.country}</span>
-                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setStatusFilter(supplier.relationship_status)}
+                        className="p-0 h-auto"
+                      >
+                        {getStatusBadge(supplier.relationship_status)}
+                      </Button>
                     </td>
-                    <td className="p-2">{getStatusBadge(supplier.relationship_status)}</td>
                     <td className="p-2">
                       <div className="space-y-1">
                         <div className="flex items-center gap-1">
@@ -419,7 +505,16 @@ export default function Suppliers() {
                         {supplier.payment_terms}
                       </div>
                     </td>
-                    <td className="p-2">{getRiskBadge(supplier.risk_level)}</td>
+                    <td className="p-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setRiskFilter(supplier.risk_level)}
+                        className="p-0 h-auto"
+                      >
+                        {getRiskBadge(supplier.risk_level)}
+                      </Button>
+                    </td>
                     <td className="p-2">
                       <div className="flex gap-1">
                         <Button 

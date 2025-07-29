@@ -17,7 +17,8 @@ import {
   AlertTriangle,
   CheckCircle,
   Clock,
-  TrendingUp
+  TrendingUp,
+  X
 } from 'lucide-react';
 import { getItems } from '@/data/seed';
 import { Item } from '@/types/domain';
@@ -131,10 +132,28 @@ export default function Items() {
     });
   };
 
+  // Quick filter handlers
+  const handleQuickFilterRemove = (filterType: 'status' | 'category' | 'criticality', value?: string) => {
+    switch (filterType) {
+      case 'status':
+        setStatusFilter('all');
+        break;
+      case 'category':
+        setCategoryFilter('all');
+        break;
+      case 'criticality':
+        setCriticalityFilter('all');
+        break;
+    }
+  };
+
   // Calculate summary statistics
   const totalValue = filteredAndSortedItems.reduce((sum, item) => sum + item.total_value, 0);
   const activeItems = filteredAndSortedItems.filter(item => item.status === 'Active').length;
   const criticalItems = filteredAndSortedItems.filter(item => item.criticality === 'A').length;
+
+  // Active filters count
+  const activeFiltersCount = [statusFilter, categoryFilter, criticalityFilter].filter(f => f !== 'all').length;
 
   return (
     <div className="max-w-7xl mx-auto space-y-6">
@@ -294,12 +313,65 @@ export default function Items() {
         </CardContent>
       </Card>
 
+      {/* Active Filters */}
+      {activeFiltersCount > 0 && (
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-sm font-medium">Active filters:</span>
+          {statusFilter !== 'all' && (
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => handleQuickFilterRemove('status')}
+              className="gap-2 h-7"
+            >
+              Status: {statusFilter}
+              <X className="h-3 w-3" />
+            </Button>
+          )}
+          {categoryFilter !== 'all' && (
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => handleQuickFilterRemove('category')}
+              className="gap-2 h-7"
+            >
+              Category: {categoryFilter}
+              <X className="h-3 w-3" />
+            </Button>
+          )}
+          {criticalityFilter !== 'all' && (
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => handleQuickFilterRemove('criticality')}
+              className="gap-2 h-7"
+            >
+              Criticality: {criticalityFilter}
+              <X className="h-3 w-3" />
+            </Button>
+          )}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              setStatusFilter('all');
+              setCategoryFilter('all');
+              setCriticalityFilter('all');
+            }}
+            className="text-muted-foreground h-7"
+          >
+            Clear all
+          </Button>
+        </div>
+      )}
+
       {/* Items Table */}
       <Card>
         <CardHeader>
           <CardTitle>Items List</CardTitle>
           <CardDescription>
             {filteredAndSortedItems.length} of {items.length} items shown
+            {activeFiltersCount > 0 && <span className="text-primary"> • {activeFiltersCount} filter{activeFiltersCount > 1 ? 's' : ''} applied</span>}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -359,8 +431,26 @@ export default function Items() {
                     </td>
                     <td className="p-2 text-xs">{item.category.split(' ')[0]}</td>
                     <td className="p-2 text-xs truncate" title={item.current_supplier}>{item.current_supplier}</td>
-                    <td className="p-2">{getStatusBadge(item.status)}</td>
-                    <td className="p-2">{getCriticalityBadge(item.criticality)}</td>
+                    <td className="p-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setStatusFilter(item.status)}
+                        className="p-0 h-auto"
+                      >
+                        {getStatusBadge(item.status)}
+                      </Button>
+                    </td>
+                    <td className="p-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setCriticalityFilter(item.criticality)}
+                        className="p-0 h-auto"
+                      >
+                        {getCriticalityBadge(item.criticality)}
+                      </Button>
+                    </td>
                     <td className="p-2">
                       <div className="font-medium text-xs">{formatCurrency(item.total_value)}</div>
                       <div className="text-xs text-muted-foreground">
