@@ -15,7 +15,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Badge } from '@/components/ui/badge';
-import { Sidebar, SidebarContent, SidebarTrigger, useSidebar } from '@/components/ui/sidebar';
+import { Sidebar, SidebarContent, SidebarTrigger, SidebarProvider, useSidebar } from '@/components/ui/sidebar';
 import { getShortlist } from '@/lib/storage';
 
 interface AppShellProps {
@@ -138,10 +138,23 @@ function SourcingCopilot() {
 
 export default function AppShell({ children }: AppShellProps) {
   const shortlist = getShortlist();
+  
+  return (
+    <SidebarProvider>
+    <div className="min-h-screen flex w-full bg-background">
+      <AppShellContent shortlist={shortlist}>
+        {children}
+      </AppShellContent>
+    </div>
+    </SidebarProvider>
+  );
+}
+
+function AppShellContent({ children, shortlist }: { children: React.ReactNode; shortlist: any[] }) {
   const { state } = useSidebar();
   
   return (
-    <div className="min-h-screen flex w-full bg-background">
+    <>
       {/* Sidebar */}
       <Sidebar className={state === "collapsed" ? "w-16" : "w-64"} collapsible="icon">
         <SidebarContent className="p-4">
@@ -231,6 +244,6 @@ export default function AppShell({ children }: AppShellProps) {
           {children}
         </main>
       </div>
-    </div>
+    </>
   );
 }
