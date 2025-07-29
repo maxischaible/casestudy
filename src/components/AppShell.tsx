@@ -214,15 +214,6 @@ function AppShellContent({ children, shortlist }: { children: React.ReactNode; s
               );
             })}
           </nav>
-          
-          {state !== "collapsed" && (
-            <div className="mt-8 p-3 bg-gradient-to-br from-muted/40 to-muted/60 rounded-lg border">
-              <div className="text-center text-xs text-muted-foreground">
-                <Bot className="h-4 w-4 mx-auto mb-1" />
-                Use filters on Search & Compare pages
-              </div>
-            </div>
-          )}
         </SidebarContent>
       </Sidebar>
 
