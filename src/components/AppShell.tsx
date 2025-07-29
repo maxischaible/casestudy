@@ -165,7 +165,7 @@ function AppShellContent({ children, shortlist, setOpen }: { children: React.Rea
       {/* Sidebar */}
       <Sidebar className={state === "collapsed" ? "w-16" : "w-64"} collapsible="icon">
         <SidebarContent className="p-4">
-          <div className="flex items-center justify-between mb-8 p-2">
+          <div className={`mb-8 p-2 ${state === "collapsed" ? "flex justify-center" : "flex items-center justify-between"}`}>
             <button 
               onClick={() => setOpen(true)}
               className="flex items-center gap-3 hover:bg-muted/50 rounded-lg p-1 transition-colors flex-1"
@@ -192,42 +192,34 @@ function AppShellContent({ children, shortlist, setOpen }: { children: React.Rea
             )}
           </div>
           
-          <nav className="space-y-1">
-            {navigation.map((item) => {
-              const Icon = item.icon;
-              return (
-                <NavLink
-                  key={item.name}
-                  to={item.href}
-                  className={({ isActive }) =>
-                    `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all sidebar-transition ${
-                      isActive 
-                        ? 'bg-primary text-primary-foreground shadow-md' 
-                        : 'text-muted-foreground hover:text-foreground hover:bg-muted/80'
-                    }`
-                  }
-                  title={state === "collapsed" ? item.name : undefined}
-                >
-                  <Icon className="h-4 w-4 flex-shrink-0" />
-                  {state !== "collapsed" && (
-                    <>
-                      <span className="flex-1">{item.name}</span>
-                      {item.name === 'Compare' && shortlist.length > 0 && (
-                        <Badge variant="secondary" className="text-xs">
-                          {shortlist.length}
-                        </Badge>
-                      )}
-                    </>
-                  )}
-                  {state === "collapsed" && item.name === 'Compare' && shortlist.length > 0 && (
-                    <Badge variant="secondary" className="absolute -top-1 -right-1 text-xs min-w-[1.25rem] h-5 flex items-center justify-center p-0">
-                      {shortlist.length}
-                    </Badge>
-                  )}
-                </NavLink>
-              );
-            })}
-          </nav>
+          {state !== "collapsed" && (
+            <nav className="space-y-1">
+              {navigation.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <NavLink
+                    key={item.name}
+                    to={item.href}
+                    className={({ isActive }) =>
+                      `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all sidebar-transition ${
+                        isActive 
+                          ? 'bg-primary text-primary-foreground shadow-md' 
+                          : 'text-muted-foreground hover:text-foreground hover:bg-muted/80'
+                      }`
+                    }
+                  >
+                    <Icon className="h-4 w-4 flex-shrink-0" />
+                    <span className="flex-1">{item.name}</span>
+                    {item.name === 'Compare' && shortlist.length > 0 && (
+                      <Badge variant="secondary" className="text-xs">
+                        {shortlist.length}
+                      </Badge>
+                    )}
+                  </NavLink>
+                );
+              })}
+            </nav>
+          )}
         </SidebarContent>
       </Sidebar>
 
