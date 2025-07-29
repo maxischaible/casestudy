@@ -177,9 +177,9 @@ export default function Compare() {
         </div>
       </div>
 
-      <div className="grid lg:grid-cols-4 gap-6">
+      <div className="grid lg:grid-cols-4 gap-4 lg:gap-6">
         {/* Filters Sidebar */}
-        <div className="lg:col-span-1">
+        <div className="lg:col-span-1 order-2 lg:order-1">
           <CompareFilters 
             suppliers={shortlist} 
             onFilteredSuppliersChange={setFilteredShortlist}
@@ -187,7 +187,7 @@ export default function Compare() {
         </div>
 
         {/* Main Content */}
-        <div className="lg:col-span-3 space-y-6">
+        <div className="lg:col-span-3 space-y-4 lg:space-y-6 order-1 lg:order-2">
 
           {/* RFI Action Buttons */}
           {rfiActions && (
@@ -370,7 +370,7 @@ export default function Compare() {
               </Card>
 
               {/* Summary Cards */}
-              <div className="grid md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 <Card>
                   <CardHeader>
                     <CardTitle className="text-lg">Best Price</CardTitle>
