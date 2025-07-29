@@ -1,89 +1,169 @@
-import { PartSpec, MatchResult } from '@/types/domain';
+import { PartSpec, Supplier } from '@/types/domain';
 
-export function generateRFIEmail(
-  part: PartSpec, 
-  results: MatchResult[], 
-  contactEmail: string = 'sourcing@tacto.com'
-): string {
-  const suppliers = results.map(r => r.supplier);
-  const supplierList = suppliers.map(s => `• ${s.name} (${s.country})`).join('\n');
-  
-  const subject = `RFI: ${part.description} - ${part.part_number}`;
-  
-  const body = `Dear Supplier Partner,
+interface RfiParams {
+  to?: string;
+  subject?: string;
+  buyer: string;
+  company: string;
+  part: PartSpec;
+  candidates: Supplier[];
+  rfqDeadlineISO?: string;
+}
 
-We are issuing a Request for Information (RFI) for the following component:
+interface RfiResult {
+  filename: string;
+  content: string;
+  copyText: string;
+}
+
+export function buildRfiEml(params: RfiParams): RfiResult {
+  const {
+    to = '',
+    subject,
+    buyer,
+    company,
+    part,
+    candidates,
+    rfqDeadlineISO
+  } = params;
+
+  // Generate subject if not provided
+  const emailSubject = subject || `RFI: ${part.description || 'Component'} - ${part.part_number || 'TBD'}`;
+  
+  // Format deadline
+  const deadline = rfqDeadlineISO 
+    ? new Date(rfqDeadlineISO).toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      })
+    : new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric' 
+      });
+
+  // Build email body
+  const bodyText = `Dear Supplier Partner,
+
+We hope this message finds you well. ${company} is seeking qualified suppliers for a strategic component and would like to invite you to participate in our Request for Information (RFI) process.
 
 PART SPECIFICATION:
-- Part Number: ${part.part_number}
-- Description: ${part.description}
-- Material: ${part.material}
-- Manufacturing Process: ${part.process}
-- Annual Volume: ${part.annual_volume.toLocaleString()} units
-${part.tolerance ? `- Tolerance: ${part.tolerance}` : ''}
-${part.target_unit_price ? `- Target Unit Price: €${part.target_unit_price}` : ''}
+• Part Number: ${part.part_number || 'TBD'}
+• Description: ${part.description || 'N/A'}
+• Material: ${part.material || 'N/A'}
+• Manufacturing Process: ${part.process || 'N/A'}
+• Annual Volume: ${part.annual_volume ? part.annual_volume.toLocaleString() : 'TBD'} units${part.target_unit_price ? `\n• Target Unit Price: €${part.target_unit_price}` : ''}
 
 INFORMATION REQUESTED:
-1. Unit pricing for quantities: ${Math.floor(part.annual_volume * 0.1).toLocaleString()}, ${Math.floor(part.annual_volume * 0.5).toLocaleString()}, ${part.annual_volume.toLocaleString()} units/year
-2. Lead time for prototypes and series production
-3. Minimum order quantities
-4. Available capacity and production slots
-5. Quality certifications (ISO 9001, IATF 16949, etc.)
-6. Sample availability and timeline
+1. Unit pricing for various quantities (prototype, low-volume, series production)
+2. Lead times for prototypes and series production
+3. Minimum order quantities and setup costs
+4. Available production capacity and delivery timelines
+5. Quality certifications (IATF 16949 required for automotive applications)
+6. Sample availability and timeline for qualification
 
-SUPPLIER SELECTION CRITERIA:
-- EU-based manufacturing preferred
-- IATF 16949 certification required for automotive applications
-- Proven track record in similar components
-- Competitive pricing with transparent cost breakdown
-- Flexible capacity for volume fluctuations
+SUPPLIER REQUIREMENTS:
+• IATF 16949 certification mandatory for automotive components
+• ISO 9001 quality management system
+• Proven track record in similar manufacturing processes
+• Capacity for annual volumes of ${part.annual_volume ? part.annual_volume.toLocaleString() : 'TBD'} units
+• Competitive pricing with transparent cost breakdown
+
+ATTACHMENTS:
+Please find attached:
+• Technical drawing/specification (placeholder)
+• Quality requirements document (placeholder)
+• Supplier questionnaire template
+
+CONFIDENTIALITY & NDA:
+This information is confidential and proprietary to ${company}. Please sign and return the attached Non-Disclosure Agreement before proceeding with any technical discussions.
 
 NEXT STEPS:
-1. Please confirm receipt and interest by [DATE + 3 days]
-2. Submit preliminary information by [DATE + 1 week]
-3. Selected suppliers will receive detailed RFQ package
-4. Supplier audit and sample evaluation phase
+1. Confirm interest and NDA return by ${new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toLocaleDateString()}
+2. Submit preliminary information by ${deadline}
+3. Technical discussions and capability review
+4. Sample submission and qualification phase
 5. Final supplier selection and contract negotiation
 
-CONFIDENTIALITY:
-This information is confidential and proprietary. Please sign and return the attached NDA before proceeding.
+For any questions or clarifications, please contact:
+${buyer}
+${company}
 
-Selected suppliers for this RFI:
-${supplierList}
-
-For questions, please contact:
-${contactEmail}
+Thank you for your interest in this opportunity. We look forward to your response.
 
 Best regards,
-Tacto Sourcing Team
+${buyer}
+Sourcing Team
+${company}
 
 ---
-This email was generated by Tacto Sourcing Platform
-`;
+Generated by TACTO Sourcing Platform
+${new Date().toLocaleString()}`;
 
-  // Create mailto link content
-  const emlContent = `Subject: ${subject}
+  // Create .eml content with proper headers
+  const emlContent = `To: ${to}
+Subject: ${emailSubject}
+From: ${buyer} <${buyer.toLowerCase().replace(/\s+/g, '.')}@${company.toLowerCase().replace(/\s+/g, '')}.com>
+Date: ${new Date().toUTCString()}
 Content-Type: text/plain; charset=UTF-8
 
-${body}`;
+${bodyText}`;
 
-  return emlContent;
+  // Generate filename
+  const safePartNumber = (part.part_number || 'Component').replace(/[^a-zA-Z0-9]/g, '');
+  const filename = `RFI_${safePartNumber}.eml`;
+
+  return {
+    filename,
+    content: emlContent,
+    copyText: bodyText
+  };
 }
 
-export function copyRFIToClipboard(content: string): Promise<void> {
-  return navigator.clipboard.writeText(content);
+export function downloadEmlFile(filename: string, content: string): void {
+  try {
+    const blob = new Blob([content], { type: 'message/rfc822' });
+    const url = URL.createObjectURL(blob);
+    
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    link.style.display = 'none';
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    // Clean up the URL object
+    setTimeout(() => URL.revokeObjectURL(url), 100);
+  } catch (error) {
+    console.error('Error downloading EML file:', error);
+    throw new Error('Failed to download EML file');
+  }
 }
 
-export function downloadEMLFile(content: string, filename: string = 'rfi-email.eml'): void {
-  const blob = new Blob([content], { type: 'message/rfc822' });
-  const url = URL.createObjectURL(blob);
-  
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = filename;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  
-  URL.revokeObjectURL(url);
+export function copyToClipboard(text: string): Promise<void> {
+  if (navigator.clipboard && window.isSecureContext) {
+    return navigator.clipboard.writeText(text);
+  } else {
+    // Fallback for older browsers or non-secure contexts
+    return new Promise((resolve, reject) => {
+      try {
+        const textArea = document.createElement('textarea');
+        textArea.value = text;
+        textArea.style.position = 'fixed';
+        textArea.style.left = '-999999px';
+        textArea.style.top = '-999999px';
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+        resolve();
+      } catch (error) {
+        reject(error);
+      }
+    });
+  }
 }

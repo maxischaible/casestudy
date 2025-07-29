@@ -4,10 +4,10 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
-import { Download, Mail, X, Eye } from 'lucide-react';
+import { Download, Mail, X, Eye, Copy } from 'lucide-react';
 import { getShortlist, removeFromShortlist } from '@/lib/storage';
-import { exportShortlistToPDF } from '@/lib/pdf';
-import { generateRFIEmail, copyRFIToClipboard } from '@/lib/rfi';
+import { exportShortlistPdf } from '@/lib/pdf';
+import { buildRfiEml, downloadEmlFile, copyToClipboard } from '@/lib/rfi';
 import { samplePartSpecs } from '@/data/seed';
 import { useNavigate } from 'react-router-dom';
 
@@ -35,23 +35,40 @@ export default function Compare() {
       return;
     }
 
-    // Convert suppliers to match results for PDF export
-    const mockResults = shortlist.map(supplier => ({
-      supplier,
-      switching_cost_score: 75 + Math.floor(Math.random() * 20),
-      estimated_savings_rate: Math.random() * 0.25,
-      audit_readiness: 'Audit-ready' as const,
-      reasons: [`Strong process match`, `Excellent certifications`]
-    }));
+    try {
+      // Transform shortlist to match the expected format for PDF export
+      const items = shortlist.map(supplier => ({
+        supplierName: supplier.name,
+        score: 75 + Math.floor(Math.random() * 20), // Mock score
+        savingsPct: Math.random() * 25, // Mock savings percentage
+        audit: 'Audit-ready',
+        country: supplier.country,
+        processes: supplier.processes,
+        materials: supplier.materials
+      }));
 
-    exportShortlistToPDF(mockResults);
-    toast({
-      title: "PDF Exported",
-      description: "Shortlist comparison has been downloaded."
-    });
+      const meta = {
+        part: samplePartSpecs()[0]?.part_number || 'Demo Part',
+        date: new Date().toLocaleDateString(),
+        scope: 'DACH' // Could be made dynamic based on UI selection
+      };
+
+      exportShortlistPdf(items, meta);
+      
+      toast({
+        title: "PDF Exported",
+        description: "Shortlist comparison has been downloaded."
+      });
+    } catch (error) {
+      toast({
+        title: "Export Failed",
+        description: "Failed to generate PDF. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
-  const handleGenerateRFI = async () => {
+  const handleGenerateRFI = () => {
     if (shortlist.length === 0) {
       toast({
         title: "No Suppliers",
@@ -61,31 +78,58 @@ export default function Compare() {
       return;
     }
 
-    const demoPartSpec = samplePartSpecs()[0];
-    const mockResults = shortlist.map(supplier => ({
-      supplier,
-      switching_cost_score: 75 + Math.floor(Math.random() * 20),
-      estimated_savings_rate: Math.random() * 0.25,
-      audit_readiness: 'Audit-ready' as const,
-      reasons: [`Strong process match`, `Excellent certifications`]
-    }));
-
-    const rfiContent = generateRFIEmail(demoPartSpec, mockResults);
-    
     try {
-      await copyRFIToClipboard(rfiContent);
-      toast({
-        title: "RFI Copied",
-        description: "RFI email has been copied to clipboard."
+      const demoPartSpec = samplePartSpecs()[0];
+      
+      const rfiData = buildRfiEml({
+        buyer: 'Sarah Johnson',
+        company: 'TACTO Manufacturing',
+        part: demoPartSpec,
+        candidates: shortlist,
+        rfqDeadlineISO: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString()
       });
+
+      // Create buttons for download and copy actions
+      const handleDownload = () => {
+        downloadEmlFile(rfiData.filename, rfiData.content);
+        toast({
+          title: "RFI Downloaded",
+          description: `${rfiData.filename} has been downloaded.`
+        });
+      };
+
+      const handleCopy = async () => {
+        try {
+          await copyToClipboard(rfiData.copyText);
+          toast({
+            title: "RFI Copied",
+            description: "RFI content has been copied to clipboard."
+          });
+        } catch (error) {
+          toast({
+            title: "Copy Failed",
+            description: "Failed to copy to clipboard. Please try again.",
+            variant: "destructive"
+          });
+        }
+      };
+
+      // Show action buttons
+      setRfiActions({ handleDownload, handleCopy });
+      
     } catch (error) {
       toast({
-        title: "Copy Failed",
-        description: "Please copy the RFI content manually.",
+        title: "RFI Generation Failed",
+        description: "Failed to generate RFI. Please try again.",
         variant: "destructive"
       });
     }
   };
+
+  const [rfiActions, setRfiActions] = useState<{
+    handleDownload: () => void;
+    handleCopy: () => void;
+  } | null>(null);
 
   if (shortlist.length === 0) {
     return (
@@ -116,10 +160,37 @@ export default function Compare() {
           </Button>
           <Button onClick={handleGenerateRFI}>
             <Mail className="h-4 w-4 mr-2" />
-            Generate RFI
+            Create RFI Draft
           </Button>
         </div>
       </div>
+
+      {/* RFI Action Buttons */}
+      {rfiActions && (
+        <Card className="border-primary/20 bg-primary/5">
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="font-medium">RFI Draft Ready</h3>
+                <p className="text-sm text-muted-foreground">Choose how to use your generated RFI</p>
+              </div>
+              <div className="flex gap-2">
+                <Button variant="outline" onClick={rfiActions.handleDownload}>
+                  <Download className="h-4 w-4 mr-2" />
+                  Download .eml
+                </Button>
+                <Button onClick={rfiActions.handleCopy}>
+                  <Copy className="h-4 w-4 mr-2" />
+                  Copy to Clipboard
+                </Button>
+                <Button variant="ghost" onClick={() => setRfiActions(null)}>
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       <div className="grid gap-6">
         {/* Comparison Table */}
