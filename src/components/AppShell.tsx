@@ -182,12 +182,19 @@ function AppShellContent({ children, shortlist }: { children: React.ReactNode; s
       <Sidebar className={state === "collapsed" ? "w-16" : "w-64"} collapsible="icon">
         <SidebarContent className="p-4">
           <div className="flex items-center gap-3 mb-8 p-2">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-              <Building2 className="h-5 w-5 text-primary-foreground" />
+            <div className="w-8 h-8 flex items-center justify-center">
+              <svg width="20" height="20" viewBox="0 0 40.36 42" xmlns="http://www.w3.org/2000/svg">
+                <path 
+                  fillRule="evenodd" 
+                  clipRule="evenodd" 
+                  d="M30.2956 20.5448C24.8485 20.5448 20.4326 16.129 20.4326 10.6819V1.07116C20.4326 0.931839 20.3197 0.818901 20.1804 0.818901C20.0411 0.818901 19.9281 0.931839 19.9281 1.07116V10.6819C19.9281 16.129 15.5123 20.5448 10.0652 20.5448H0.252255C0.112938 20.5448 1.21798e-08 20.6578 0 20.7971C-1.21798e-08 20.9364 0.112938 21.0493 0.252254 21.0493H9.96407C15.4671 21.0493 19.9281 25.5104 19.9281 31.0134V40.9274C19.9281 41.0667 20.0411 41.1797 20.1804 41.1797C20.3197 41.1797 20.4326 41.0667 20.4326 40.9274V31.0134C20.4326 25.5104 24.8937 21.0493 30.3967 21.0493L40.1085 21.0493C40.2478 21.0493 40.3608 20.9364 40.3608 20.7971C40.3608 20.6578 40.2478 20.5448 40.1085 20.5448L30.2956 20.5448Z" 
+                  fill="#FF6414"
+                />
+              </svg>
             </div>
             {state !== "collapsed" && (
               <div>
-                <div className="text-lg font-bold text-primary">TACTO</div>
+                <div className="text-lg font-bold text-primary">tacto</div>
                 <div className="text-xs text-muted-foreground">Sourcing Platform</div>
               </div>
             )}
@@ -278,16 +285,7 @@ function AppShellContent({ children, shortlist }: { children: React.ReactNode; s
             <div className="flex items-center gap-4">
               <SidebarTrigger className="hover:bg-muted rounded-md p-2" />
               <div className="flex items-center gap-3">
-                <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 bg-primary rounded-md flex items-center justify-center">
-                    <Building2 className="h-4 w-4 text-primary-foreground" />
-                  </div>
-                  <div>
-                    <div className="font-semibold text-foreground">TACTO Sourcing Platform</div>
-                    <div className="text-xs text-muted-foreground">Strategic Supplier Intelligence</div>
-                  </div>
-                </div>
-                <Badge variant="outline" className="text-xs border-primary text-primary ml-2">DACH Scope</Badge>
+                <Badge variant="outline" className="text-xs border-primary text-primary">DACH Scope</Badge>
               </div>
             </div>
             
