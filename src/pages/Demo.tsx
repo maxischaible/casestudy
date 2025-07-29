@@ -4,7 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { ArrowRight, Zap, Globe, Shield, Clock, Search, Upload, GitCompare, TrendingUp } from 'lucide-react';
 
-export default function Home() {
+export default function Demo() {
   const navigate = useNavigate();
 
   const handleRunDemo = () => {

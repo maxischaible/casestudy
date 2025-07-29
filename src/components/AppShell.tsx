@@ -26,10 +26,9 @@ interface AppShellProps {
 }
 
 const navigation = [
-  { name: 'Home', href: '/', icon: Home },
   { name: 'Search & Match', href: '/search', icon: Search },
   { name: 'Compare', href: '/compare', icon: GitCompare },
-  { name: 'BOM Import', href: '/import', icon: Upload },
+  { name: 'Import BOM', href: '/import', icon: Upload },
   { name: 'Admin', href: '/admin', icon: Settings },
 ];
 

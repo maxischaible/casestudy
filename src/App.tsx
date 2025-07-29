@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import AppShell from "./components/AppShell";
-import Home from "./pages/Home";
+import Demo from "./pages/Demo";
 import Search from "./pages/Search";
 import SupplierProfile from "./pages/SupplierProfile";
 import Compare from "./pages/Compare";
@@ -23,7 +23,8 @@ const App = () => (
       <BrowserRouter>
         <AppShell>
           <Routes>
-            <Route path="/" element={<Home />} />
+            <Route path="/" element={<Demo />} />
+            <Route path="/demo" element={<Demo />} />
             <Route path="/search" element={<Search />} />
             <Route path="/supplier/:id" element={<SupplierProfile />} />
             <Route path="/compare" element={<Compare />} />
