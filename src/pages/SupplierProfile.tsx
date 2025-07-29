@@ -326,7 +326,7 @@ export default function SupplierProfile() {
                   
                   <div className="grid md:grid-cols-3 gap-4 text-center">
                     <div className="p-4 bg-muted/50 rounded-lg">
-                      <div className="text-2xl font-bold text-primary">{supplier.quality.defect_rate_ppm}</div>
+                      <div className="text-2xl font-bold text-primary">{supplier.quality.defect_rate_ppm.toFixed(2)}</div>
                       <div className="text-sm text-muted-foreground">Defect Rate (PPM)</div>
                     </div>
                     <div className="p-4 bg-muted/50 rounded-lg">

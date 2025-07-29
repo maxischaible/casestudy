@@ -334,7 +334,7 @@ export default function Compare() {
                           <td className="p-4 font-medium">Defect Rate</td>
                           {filteredShortlist.map((supplier) => (
                             <td key={supplier.id} className="p-4">
-                              {supplier.quality.defect_rate_ppm} PPM
+                              {supplier.quality.defect_rate_ppm.toFixed(2)} PPM
                             </td>
                           ))}
                         </tr>
