@@ -149,7 +149,7 @@ export default function AppShell({ children }: AppShellProps) {
   return (
     <SidebarProvider open={open} onOpenChange={setOpen}>
     <div className="min-h-screen flex w-full bg-background">
-      <AppShellContent shortlist={shortlist}>
+      <AppShellContent shortlist={shortlist} setOpen={setOpen}>
         {children}
       </AppShellContent>
     </div>
@@ -157,7 +157,7 @@ export default function AppShell({ children }: AppShellProps) {
   );
 }
 
-function AppShellContent({ children, shortlist }: { children: React.ReactNode; shortlist: any[] }) {
+function AppShellContent({ children, shortlist, setOpen }: { children: React.ReactNode; shortlist: any[]; setOpen: (open: boolean) => void }) {
   const { state } = useSidebar();
   
   return (
@@ -166,8 +166,11 @@ function AppShellContent({ children, shortlist }: { children: React.ReactNode; s
       <Sidebar className={state === "collapsed" ? "w-16" : "w-64"} collapsible="icon">
         <SidebarContent className="p-4">
           <div className="flex items-center justify-between mb-8 p-2">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 flex items-center justify-center">
+            <button 
+              onClick={() => setOpen(true)}
+              className="flex items-center gap-3 hover:bg-muted/50 rounded-lg p-1 transition-colors flex-1"
+            >
+              <div className="w-8 h-8 flex items-center justify-center flex-shrink-0">
                 <svg width="20" height="20" viewBox="0 0 40.36 42" xmlns="http://www.w3.org/2000/svg">
                   <path 
                     fillRule="evenodd" 
@@ -178,13 +181,15 @@ function AppShellContent({ children, shortlist }: { children: React.ReactNode; s
                 </svg>
               </div>
               {state !== "collapsed" && (
-                <div>
+                <div className="text-left">
                   <div className="text-lg font-bold text-primary">tacto</div>
                   <div className="text-xs text-muted-foreground">Sourcing Platform</div>
                 </div>
               )}
-            </div>
-            <SidebarTrigger className="hover:bg-muted rounded-md p-2 flex-shrink-0" />
+            </button>
+            {state !== "collapsed" && (
+              <SidebarTrigger className="hover:bg-muted rounded-md p-2 flex-shrink-0" />
+            )}
           </div>
           
           <nav className="space-y-1">
@@ -201,6 +206,7 @@ function AppShellContent({ children, shortlist }: { children: React.ReactNode; s
                         : 'text-muted-foreground hover:text-foreground hover:bg-muted/80'
                     }`
                   }
+                  title={state === "collapsed" ? item.name : undefined}
                 >
                   <Icon className="h-4 w-4 flex-shrink-0" />
                   {state !== "collapsed" && (
@@ -213,6 +219,11 @@ function AppShellContent({ children, shortlist }: { children: React.ReactNode; s
                       )}
                     </>
                   )}
+                  {state === "collapsed" && item.name === 'Compare' && shortlist.length > 0 && (
+                    <Badge variant="secondary" className="absolute -top-1 -right-1 text-xs min-w-[1.25rem] h-5 flex items-center justify-center p-0">
+                      {shortlist.length}
+                    </Badge>
+                  )}
                 </NavLink>
               );
             })}
@@ -224,13 +235,7 @@ function AppShellContent({ children, shortlist }: { children: React.ReactNode; s
       <div className="flex-1 flex flex-col">
         {/* Top Navigation */}
         <header className="h-16 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-40">
-          <div className="flex items-center justify-between h-full px-4 sm:px-6">
-            <div className="flex items-center gap-4">
-              {/* Mobile menu trigger - only visible on small screens when sidebar is collapsed */}
-              <div className="lg:hidden">
-                <SidebarTrigger className="hover:bg-muted rounded-md p-2" />
-              </div>
-            </div>
+          <div className="flex items-center justify-end h-full px-4 sm:px-6">
             
             <div className="flex items-center gap-4">
               <SourcingCopilot />
