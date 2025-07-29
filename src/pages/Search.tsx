@@ -15,6 +15,7 @@ import { addToShortlist, isInShortlist } from '@/lib/storage';
 import { useNavigate } from 'react-router-dom';
 import { useFilters } from '@/contexts/FilterContext';
 import { applyFilters } from '@/lib/filters';
+import { SearchFilters } from '@/components/SearchFilters';
 
 export default function Search() {
   const [searchParams] = useSearchParams();
@@ -86,6 +87,8 @@ export default function Search() {
     return colors[status as keyof typeof colors] || colors['Major gaps'];
   };
 
+  const allSuppliers = getSuppliers();
+
   return (
     <div className="max-w-7xl mx-auto space-y-6">
       <div className="flex justify-between items-center">
@@ -101,7 +104,15 @@ export default function Search() {
         </div>
       </div>
 
-      {/* Part Specification Form */}
+      <div className="grid lg:grid-cols-4 gap-6">
+        {/* Filters Sidebar */}
+        <div className="lg:col-span-1">
+          <SearchFilters suppliers={allSuppliers} />
+        </div>
+
+        {/* Main Content */}
+        <div className="lg:col-span-3 space-y-6">
+          {/* Part Specification Form */}
       <Card>
         <CardHeader>
           <CardTitle>Part Specification</CardTitle>
@@ -186,106 +197,108 @@ export default function Search() {
             {isSearching ? 'Searching...' : 'Find Suppliers'}
           </Button>
         </CardContent>
-      </Card>
+          </Card>
 
-      {/* Search Results */}
-      {results.length > 0 && (
-        <div className="space-y-4">
-          <h2 className="text-xl font-semibold">Matching Suppliers</h2>
+          {/* Search Results */}
+          {results.length > 0 && (
+            <div className="space-y-4">
+              <h2 className="text-xl font-semibold">Matching Suppliers</h2>
+              
+              <div className="grid gap-4">
+                {results.map((result) => (
+                  <Card key={result.supplier.id} className="hover:shadow-lg transition-shadow">
+                    <CardContent className="p-6">
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1 space-y-3">
+                          <div className="flex items-center justify-between">
+                            <h3 className="text-lg font-semibold">{result.supplier.name}</h3>
+                            <div className="flex items-center gap-2">
+                              <MapPin className="h-4 w-4 text-muted-foreground" />
+                              <span className="text-sm text-muted-foreground">
+                                {result.supplier.city}, {result.supplier.country}
+                              </span>
+                            </div>
+                          </div>
+                          
+                          <div className="flex flex-wrap gap-2">
+                            {result.supplier.certifications.slice(0, 3).map((cert) => (
+                              <Badge key={cert.code} variant="secondary">
+                                {cert.code}
+                              </Badge>
+                            ))}
+                            <Badge className={getAuditReadinessBadge(result.audit_readiness)}>
+                              {result.audit_readiness}
+                            </Badge>
+                          </div>
+                          
+                          <div className="grid md:grid-cols-3 gap-4 text-sm">
+                            <div className="flex items-center gap-2">
+                              <Clock className="h-4 w-4 text-muted-foreground" />
+                              <span>{result.supplier.lead_time_days} days lead time</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <Package className="h-4 w-4 text-muted-foreground" />
+                              <span>MOQ: {result.supplier.moq.toLocaleString()}</span>
+                            </div>
+                            <div>
+                              <span className="font-medium text-green-600">
+                                {(result.estimated_savings_rate * 100).toFixed(1)}% potential savings
+                              </span>
+                            </div>
+                          </div>
+                          
+                          <div className="space-y-2">
+                            <div className="flex justify-between text-sm">
+                              <span>Match Score</span>
+                              <span className="font-medium">{result.switching_cost_score}%</span>
+                            </div>
+                            <Progress value={result.switching_cost_score} className="h-2" />
+                          </div>
+                          
+                          {result.reasons.length > 0 && (
+                            <div className="text-sm text-muted-foreground">
+                              <strong>Why this match:</strong> {result.reasons.slice(0, 2).join('; ')}
+                            </div>
+                          )}
+                        </div>
+                        
+                        <div className="flex flex-col gap-2 ml-6">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => navigate(`/supplier/${result.supplier.id}`)}
+                          >
+                            <Eye className="h-4 w-4 mr-2" />
+                            View
+                          </Button>
+                          <Button
+                            size="sm"
+                            onClick={() => handleAddToShortlist(result)}
+                            disabled={isInShortlist(result.supplier.id)}
+                          >
+                            <Plus className="h-4 w-4 mr-2" />
+                            {isInShortlist(result.supplier.id) ? 'Added' : 'Shortlist'}
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          )}
           
-          <div className="grid gap-4">
-            {results.map((result) => (
-              <Card key={result.supplier.id} className="hover:shadow-lg transition-shadow">
-                <CardContent className="p-6">
-                  <div className="flex justify-between items-start">
-                    <div className="flex-1 space-y-3">
-                      <div className="flex items-center justify-between">
-                        <h3 className="text-lg font-semibold">{result.supplier.name}</h3>
-                        <div className="flex items-center gap-2">
-                          <MapPin className="h-4 w-4 text-muted-foreground" />
-                          <span className="text-sm text-muted-foreground">
-                            {result.supplier.city}, {result.supplier.country}
-                          </span>
-                        </div>
-                      </div>
-                      
-                      <div className="flex flex-wrap gap-2">
-                        {result.supplier.certifications.slice(0, 3).map((cert) => (
-                          <Badge key={cert.code} variant="secondary">
-                            {cert.code}
-                          </Badge>
-                        ))}
-                        <Badge className={getAuditReadinessBadge(result.audit_readiness)}>
-                          {result.audit_readiness}
-                        </Badge>
-                      </div>
-                      
-                      <div className="grid md:grid-cols-3 gap-4 text-sm">
-                        <div className="flex items-center gap-2">
-                          <Clock className="h-4 w-4 text-muted-foreground" />
-                          <span>{result.supplier.lead_time_days} days lead time</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Package className="h-4 w-4 text-muted-foreground" />
-                          <span>MOQ: {result.supplier.moq.toLocaleString()}</span>
-                        </div>
-                        <div>
-                          <span className="font-medium text-green-600">
-                            {(result.estimated_savings_rate * 100).toFixed(1)}% potential savings
-                          </span>
-                        </div>
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <div className="flex justify-between text-sm">
-                          <span>Match Score</span>
-                          <span className="font-medium">{result.switching_cost_score}%</span>
-                        </div>
-                        <Progress value={result.switching_cost_score} className="h-2" />
-                      </div>
-                      
-                      {result.reasons.length > 0 && (
-                        <div className="text-sm text-muted-foreground">
-                          <strong>Why this match:</strong> {result.reasons.slice(0, 2).join('; ')}
-                        </div>
-                      )}
-                    </div>
-                    
-                    <div className="flex flex-col gap-2 ml-6">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => navigate(`/supplier/${result.supplier.id}`)}
-                      >
-                        <Eye className="h-4 w-4 mr-2" />
-                        View
-                      </Button>
-                      <Button
-                        size="sm"
-                        onClick={() => handleAddToShortlist(result)}
-                        disabled={isInShortlist(result.supplier.id)}
-                      >
-                        <Plus className="h-4 w-4 mr-2" />
-                        {isInShortlist(result.supplier.id) ? 'Added' : 'Shortlist'}
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+          {results.length === 0 && !isSearching && (
+            <Card>
+              <CardContent className="text-center py-12">
+                <p className="text-muted-foreground">
+                  Enter part specifications above to find matching suppliers
+                </p>
+              </CardContent>
+            </Card>
+          )}
         </div>
-      )}
-      
-      {results.length === 0 && !isSearching && (
-        <Card>
-          <CardContent className="text-center py-12">
-            <p className="text-muted-foreground">
-              Enter part specifications above to find matching suppliers
-            </p>
-          </CardContent>
-        </Card>
-      )}
+      </div>
     </div>
   );
 }
