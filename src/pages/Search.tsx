@@ -100,7 +100,7 @@ export default function Search() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid md:grid-cols-3 gap-4">
+        <div className="grid md:grid-cols-3 gap-4">
             <div className="space-y-2">
               <Label htmlFor="part_number">Part Number</Label>
               <Input
@@ -108,6 +108,7 @@ export default function Search() {
                 value={partSpec.part_number}
                 onChange={(e) => setPartSpec(prev => ({ ...prev, part_number: e.target.value }))}
                 placeholder="AUTO-BRK-001"
+                className="border-primary/20 focus:border-primary"
               />
             </div>
             <div className="space-y-2">
@@ -118,6 +119,7 @@ export default function Search() {
                 onChange={(e) => setPartSpec(prev => ({ ...prev, description: e.target.value }))}
                 placeholder="Automotive bracket"
                 required
+                className="border-primary/20 focus:border-primary"
               />
             </div>
             <div className="space-y-2">
@@ -128,6 +130,7 @@ export default function Search() {
                 onChange={(e) => setPartSpec(prev => ({ ...prev, material: e.target.value }))}
                 placeholder="Al 6061"
                 required
+                className="border-primary/20 focus:border-primary"
               />
             </div>
             <div className="space-y-2">
@@ -138,6 +141,7 @@ export default function Search() {
                 onChange={(e) => setPartSpec(prev => ({ ...prev, process: e.target.value }))}
                 placeholder="CNC milling"
                 required
+                className="border-primary/20 focus:border-primary"
               />
             </div>
             <div className="space-y-2">
@@ -148,6 +152,7 @@ export default function Search() {
                 value={partSpec.annual_volume || ''}
                 onChange={(e) => setPartSpec(prev => ({ ...prev, annual_volume: parseInt(e.target.value) || 0 }))}
                 placeholder="25000"
+                className="border-primary/20 focus:border-primary"
               />
             </div>
             <div className="space-y-2">
@@ -159,6 +164,7 @@ export default function Search() {
                 value={partSpec.target_unit_price || ''}
                 onChange={(e) => setPartSpec(prev => ({ ...prev, target_unit_price: parseFloat(e.target.value) || undefined }))}
                 placeholder="12.50"
+                className="border-primary/20 focus:border-primary"
               />
             </div>
           </div>

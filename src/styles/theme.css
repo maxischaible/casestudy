@@ -1,0 +1,114 @@
+:root {
+  --brand-orange: #ff7a1a;
+  --brand-orange-hover: #e6691a;
+  --brand-orange-light: #fff5f0;
+  
+  /* Base colors */
+  --background: 0 0% 100%;
+  --foreground: 240 10% 3.9%;
+  
+  /* Muted colors */
+  --muted: 210 40% 98%;
+  --muted-foreground: 215.4 16.3% 46.9%;
+  
+  /* Border and input */
+  --border: 214.3 31.8% 91.4%;
+  --input: 214.3 31.8% 91.4%;
+  
+  /* Primary brand */
+  --primary: 25 95% 53%;
+  --primary-foreground: 0 0% 100%;
+  
+  /* Secondary */
+  --secondary: 210 40% 96%;
+  --secondary-foreground: 222.2 84% 4.9%;
+  
+  /* Accent */
+  --accent: 210 40% 96%;
+  --accent-foreground: 222.2 84% 4.9%;
+  
+  /* Destructive */
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 210 40% 98%;
+  
+  /* Success */
+  --success: 142.1 76.2% 36.3%;
+  --success-foreground: 355.7 100% 97.3%;
+  
+  /* Warning */
+  --warning: 32 95% 44%;
+  --warning-foreground: 355.7 100% 97.3%;
+  
+  /* Ring */
+  --ring: 25 95% 53%;
+  
+  /* Radius */
+  --radius: 0.5rem;
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+.dark {
+  --background: 222.2 84% 4.9%;
+  --foreground: 210 40% 98%;
+  
+  --muted: 217.2 32.6% 17.5%;
+  --muted-foreground: 215 20.2% 65.1%;
+  
+  --border: 217.2 32.6% 17.5%;
+  --input: 217.2 32.6% 17.5%;
+  
+  --primary: 25 95% 53%;
+  --primary-foreground: 222.2 84% 4.9%;
+  
+  --secondary: 217.2 32.6% 17.5%;
+  --secondary-foreground: 210 40% 98%;
+  
+  --accent: 217.2 32.6% 17.5%;
+  --accent-foreground: 210 40% 98%;
+  
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 210 40% 98%;
+  
+  --ring: 25 95% 53%;
+}
+
+/* Custom utilities */
+.brand-orange {
+  color: var(--brand-orange);
+}
+
+.bg-brand-orange {
+  background-color: var(--brand-orange);
+}
+
+.border-brand-orange {
+  border-color: var(--brand-orange);
+}
+
+.hover\:bg-brand-orange:hover {
+  background-color: var(--brand-orange);
+}
+
+.hover\:bg-brand-orange-hover:hover {
+  background-color: var(--brand-orange-hover);
+}
+
+/* Sidebar animations */
+.sidebar-transition {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Card hover effects */
+.card-hover {
+  transition: all 0.2s ease-in-out;
+}
+
+.card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}

@@ -1,169 +1,156 @@
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowRight, Zap, Globe, Shield, Clock } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { ArrowRight, Zap, Globe, Shield, Clock, Search, Upload, GitCompare, TrendingUp } from 'lucide-react';
 
 export default function Home() {
   const navigate = useNavigate();
 
   const handleRunDemo = () => {
-    // Navigate to search with pre-filled demo data
     navigate('/search?demo=true');
   };
 
   return (
-    <div className="max-w-6xl mx-auto space-y-8">
+    <div className="max-w-6xl mx-auto space-y-12">
       {/* Hero Section */}
       <div className="text-center space-y-6 py-12">
-        <h1 className="text-4xl font-bold tracking-tight">
-          Intelligent Supplier Sourcing
-        </h1>
-        <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-          Leverage AI-powered matching to find the optimal European suppliers for your manufacturing needs. 
-          Reduce costs, improve quality, and accelerate time-to-market.
-        </p>
-        <div className="flex justify-center gap-4">
-          <Button onClick={handleRunDemo} size="lg" className="gap-2">
-            <Zap className="h-4 w-4" />
-            Run the Demo
-          </Button>
-          <Button variant="outline" size="lg">
-            Learn More
-          </Button>
+        <div className="space-y-4">
+          <h1 className="text-5xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">
+            Strategic Supplier Intelligence
+          </h1>
+          <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
+            AI-powered supplier discovery, risk assessment, and sourcing optimization 
+            for manufacturing excellence in the DACH region and beyond.
+          </p>
+        </div>
+        
+        <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+          <Badge variant="outline" className="gap-1">
+            <Shield className="h-3 w-3" />
+            Trusted by 500+ manufacturers
+          </Badge>
+          <Badge variant="outline" className="gap-1">
+            <TrendingUp className="h-3 w-3" />
+            €2M+ in cost savings
+          </Badge>
         </div>
       </div>
 
-      {/* Why Now Section */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Clock className="h-5 w-5 text-primary" />
-            Why Supplier Diversification Matters Now
+      {/* Demo Section */}
+      <Card className="max-w-2xl mx-auto border-primary/20 shadow-lg card-hover">
+        <CardHeader className="text-center pb-4">
+          <CardTitle className="flex items-center justify-center gap-2 text-xl">
+            <Search className="h-6 w-6 text-primary" />
+            Experience Smart Sourcing
           </CardTitle>
-        </CardHeader>
-        <CardContent className="grid md:grid-cols-2 gap-6">
-          <div className="space-y-4">
-            <h3 className="font-semibold">Supply Chain Resilience</h3>
-            <p className="text-muted-foreground">
-              Geopolitical tensions and pandemic disruptions have exposed the risks of single-supplier dependency. 
-              Modern manufacturers need diverse, qualified supplier networks to ensure continuity.
-            </p>
-          </div>
-          <div className="space-y-4">
-            <h3 className="font-semibold">Cost Optimization</h3>
-            <p className="text-muted-foreground">
-              European suppliers often offer 10-25% cost advantages while maintaining quality standards. 
-              Our platform identifies these opportunities automatically.
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Features Grid */}
-      <div className="grid md:grid-cols-3 gap-6">
-        <Card>
-          <CardHeader>
-            <Shield className="h-8 w-8 text-primary mb-2" />
-            <CardTitle>Quality Assured</CardTitle>
-            <CardDescription>
-              All suppliers pre-qualified with ISO 9001, IATF 16949, and other industry certifications
-            </CardDescription>
-          </CardHeader>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <Globe className="h-8 w-8 text-primary mb-2" />
-            <CardTitle>EU-27 Network</CardTitle>
-            <CardDescription>
-              300+ verified suppliers across European manufacturing hubs with proven automotive experience
-            </CardDescription>
-          </CardHeader>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <Zap className="h-8 w-8 text-primary mb-2" />
-            <CardTitle>AI-Powered Matching</CardTitle>
-            <CardDescription>
-              Intelligent algorithms match your specifications with optimal suppliers based on capability, cost, and risk
-            </CardDescription>
-          </CardHeader>
-        </Card>
-      </div>
-
-      {/* Demo CTA */}
-      <Card className="bg-primary/5 border-primary/20">
-        <CardHeader>
-          <CardTitle>Experience the Platform</CardTitle>
-          <CardDescription>
-            Try our demo scenario: source an automotive aluminum bracket from European CNC suppliers
+          <CardDescription className="text-base">
+            Try our AI-powered supplier matching with a sample automotive bracket component
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="bg-background rounded-lg p-4 mb-4">
-            <div className="grid md:grid-cols-2 gap-4 text-sm">
-              <div>
-                <span className="font-medium">Demo Part:</span> Automotive bracket (AUTO-BRK-001)
+        <CardContent className="space-y-6">
+          <div className="bg-gradient-to-r from-primary/5 to-primary/10 p-6 rounded-lg border border-primary/20">
+            <div className="grid grid-cols-2 gap-4 text-sm">
+              <div className="space-y-1">
+                <div className="text-muted-foreground">Part Number</div>
+                <div className="font-medium">AUTO-BRK-001</div>
               </div>
-              <div>
-                <span className="font-medium">Material:</span> Al 6061
+              <div className="space-y-1">
+                <div className="text-muted-foreground">Material</div>
+                <div className="font-medium">Al 6061</div>
               </div>
-              <div>
-                <span className="font-medium">Process:</span> CNC milling
+              <div className="space-y-1">
+                <div className="text-muted-foreground">Process</div>
+                <div className="font-medium">CNC Milling</div>
               </div>
-              <div>
-                <span className="font-medium">Volume:</span> 25,000 units/year
+              <div className="space-y-1">
+                <div className="text-muted-foreground">Annual Volume</div>
+                <div className="font-medium">25,000 units</div>
               </div>
             </div>
           </div>
-          <Button onClick={handleRunDemo} className="gap-2">
-            Start Demo Sourcing
-            <ArrowRight className="h-4 w-4" />
+          
+          <Button 
+            size="lg" 
+            onClick={handleRunDemo}
+            className="w-full h-12 text-base bg-primary hover:bg-primary/90"
+          >
+            <Search className="h-5 w-5 mr-2" />
+            Run Demo Search
           </Button>
         </CardContent>
       </Card>
 
-      {/* Process Steps */}
-      <div className="space-y-6">
-        <h2 className="text-2xl font-bold text-center">How It Works</h2>
-        <div className="grid md:grid-cols-4 gap-6">
-          <div className="text-center space-y-2">
-            <div className="w-12 h-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold mx-auto">
-              1
-            </div>
-            <h3 className="font-medium">Specify Requirements</h3>
-            <p className="text-sm text-muted-foreground">
-              Upload part specs or BOM
+      {/* Value Propositions */}
+      <div className="grid md:grid-cols-3 gap-8">
+        <Card className="card-hover border-0 shadow-md">
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center gap-3 text-lg">
+              <div className="p-2 rounded-lg bg-green-100">
+                <Shield className="h-6 w-6 text-green-600" />
+              </div>
+              Risk Intelligence
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground leading-relaxed">
+              Real-time supplier risk assessment with financial health monitoring, 
+              compliance tracking, and geopolitical risk analysis across all supply tiers.
             </p>
-          </div>
-          <div className="text-center space-y-2">
-            <div className="w-12 h-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold mx-auto">
-              2
-            </div>
-            <h3 className="font-medium">AI Matching</h3>
-            <p className="text-sm text-muted-foreground">
-              Algorithm scores suppliers
+          </CardContent>
+        </Card>
+
+        <Card className="card-hover border-0 shadow-md">
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center gap-3 text-lg">
+              <div className="p-2 rounded-lg bg-blue-100">
+                <TrendingUp className="h-6 w-6 text-blue-600" />
+              </div>
+              Cost Optimization
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground leading-relaxed">
+              AI-driven cost modeling with should-cost analysis, market benchmarking, 
+              and automated savings opportunity identification and tracking.
             </p>
-          </div>
-          <div className="text-center space-y-2">
-            <div className="w-12 h-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold mx-auto">
-              3
-            </div>
-            <h3 className="font-medium">Compare & Shortlist</h3>
-            <p className="text-sm text-muted-foreground">
-              Review top candidates
+          </CardContent>
+        </Card>
+
+        <Card className="card-hover border-0 shadow-md">
+          <CardHeader className="pb-4">
+            <CardTitle className="flex items-center gap-3 text-lg">
+              <div className="p-2 rounded-lg" style={{ backgroundColor: 'hsl(var(--brand-orange) / 0.1)' }}>
+                <Zap className="h-6 w-6" style={{ color: 'var(--brand-orange)' }} />
+              </div>
+              Smart Matching
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-muted-foreground leading-relaxed">
+              Advanced supplier matching algorithms considering technical capabilities, 
+              capacity, certifications, geographic proximity, and strategic alignment.
             </p>
-          </div>
-          <div className="text-center space-y-2">
-            <div className="w-12 h-12 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold mx-auto">
-              4
-            </div>
-            <h3 className="font-medium">Export & Engage</h3>
-            <p className="text-sm text-muted-foreground">
-              Generate RFI emails
-            </p>
-          </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Quick Actions */}
+      <div className="text-center space-y-6 py-8">
+        <h2 className="text-2xl font-semibold">Ready to get started?</h2>
+        <div className="flex flex-wrap justify-center gap-4">
+          <Button variant="outline" size="lg" onClick={() => navigate('/search')} className="gap-2">
+            <Search className="h-4 w-4" />
+            Search Suppliers
+          </Button>
+          <Button variant="outline" size="lg" onClick={() => navigate('/import')} className="gap-2">
+            <Upload className="h-4 w-4" />
+            Import BOM
+          </Button>
+          <Button variant="outline" size="lg" onClick={() => navigate('/compare')} className="gap-2">
+            <GitCompare className="h-4 w-4" />
+            Compare Suppliers
+          </Button>
         </div>
       </div>
     </div>
