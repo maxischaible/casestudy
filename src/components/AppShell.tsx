@@ -224,9 +224,6 @@ function AppShellContent({ children, shortlist }: { children: React.ReactNode; s
           <div className="flex items-center justify-between h-full px-6">
             <div className="flex items-center gap-4">
               <SidebarTrigger className="hover:bg-muted rounded-md p-2" />
-              <div className="flex items-center gap-3">
-                <Badge variant="outline" className="text-xs border-primary text-primary">DACH Scope</Badge>
-              </div>
             </div>
             
             <div className="flex items-center gap-4">
