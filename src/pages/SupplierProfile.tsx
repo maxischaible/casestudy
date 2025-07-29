@@ -18,7 +18,7 @@ import {
   AlertTriangle,
   Search
 } from 'lucide-react';
-import { getSuppliers } from '@/data/seed';
+import { getSuppliers, getCompanySuppliers } from '@/data/seed';
 import { addToShortlist, isInShortlist } from '@/lib/storage';
 
 export default function SupplierProfile() {
@@ -26,7 +26,37 @@ export default function SupplierProfile() {
   const navigate = useNavigate();
   const { toast } = useToast();
   
-  const supplier = getSuppliers().find(s => s.id === id);
+  // Try both supplier data sources to find the supplier
+  const searchSuppliers = getSuppliers();
+  const companySuppliers = getCompanySuppliers();
+  
+  let supplier = searchSuppliers.find(s => s.id === id);
+  if (!supplier) {
+    // If not found in search suppliers, try company suppliers but convert the data structure
+    const companySupplier = companySuppliers.find(s => s.id === id);
+    if (companySupplier) {
+      // Convert CompanySupplier to Supplier format for compatibility
+      supplier = {
+        id: companySupplier.id,
+        name: companySupplier.name,
+        country: companySupplier.country,
+        city: companySupplier.city,
+        categories: companySupplier.categories,
+        processes: ['CNC milling', 'CNC turning'], // Default processes
+        materials: ['Steel S235', 'Al 6061'], // Default materials
+        certifications: companySupplier.certifications,
+        capacity: { unit: 'units/month', value: 10000 },
+        moq: 100,
+        lead_time_days: 14,
+        quality: {
+          on_time_rate: companySupplier.delivery_rating / 5,
+          defect_rate_ppm: Math.max(10, (5 - companySupplier.quality_rating) * 200)
+        },
+        price_index: 1.0,
+        website: `https://www.${companySupplier.name.toLowerCase().replace(/\s+/g, '')}.com`
+      };
+    }
+  }
   
   if (!supplier) {
     return (

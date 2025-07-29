@@ -33,7 +33,7 @@ export default function ItemDetail() {
   const { toast } = useToast();
   
   const items = getItems();
-  const suppliers = getCompanySuppliers();
+  const companySuppliers = getCompanySuppliers();
   const item = items.find(item => item.id === id);
 
   if (!item) {
@@ -56,7 +56,7 @@ export default function ItemDetail() {
     );
   }
 
-  const supplier = suppliers.find(s => s.id === item.supplier_id || s.name === item.current_supplier);
+  const supplier = companySuppliers.find(s => s.id === item.supplier_id || s.name.includes(item.current_supplier.split(' ')[0]));
 
   const getStatusBadge = (status: string) => {
     const variants = {
