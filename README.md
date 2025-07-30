@@ -1,4 +1,4 @@
-# Cas Review
+# Case Review
 
 ## Overview
 - **Hosted on**: Cloudflare pages. (https://casestudy-a6f.pages.dev)
