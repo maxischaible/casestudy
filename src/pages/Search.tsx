@@ -7,8 +7,9 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
-import { Eye, Plus, MapPin, Clock, Package, Filter as FilterIcon, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
+import { Eye, Plus, MapPin, Clock, Package, Filter as FilterIcon, ArrowUpDown, ArrowUp, ArrowDown, MessageSquare } from 'lucide-react';
 import { PartSpec, MatchResult } from '@/types/domain';
 import { getSuppliers, samplePartSpecs } from '@/data/seed';
 import { matchSuppliers } from '@/lib/match';
@@ -34,6 +35,7 @@ export default function Search() {
   const [isSearching, setIsSearching] = useState(false);
   const [sortField, setSortField] = useState<'name' | 'switching_cost_score' | 'estimated_savings_rate' | 'lead_time_days' | 'country'>('switching_cost_score');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
+  const [isNaturalLanguageMode, setIsNaturalLanguageMode] = useState(false);
 
   // Load demo data if demo=true in URL or alternative search params
   useEffect(() => {
@@ -201,10 +203,28 @@ export default function Search() {
       {/* Part Specification Form */}
       <Card>
         <CardHeader>
-          <CardTitle>Part Specification</CardTitle>
-          <CardDescription>
-            Enter your component requirements to find matching suppliers
-          </CardDescription>
+          <div className="flex justify-between items-start">
+            <div>
+              <CardTitle>Part Specification</CardTitle>
+              <CardDescription>
+                {isNaturalLanguageMode 
+                  ? "Describe your component needs in natural language"
+                  : "Enter your component requirements to find matching suppliers"
+                }
+              </CardDescription>
+            </div>
+            <div className="flex items-center gap-2">
+              <MessageSquare className="h-4 w-4 text-muted-foreground" />
+              <Label htmlFor="natural-language-toggle" className="text-sm font-medium">
+                Natural Language
+              </Label>
+              <Switch
+                id="natural-language-toggle"
+                checked={isNaturalLanguageMode}
+                onCheckedChange={setIsNaturalLanguageMode}
+              />
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
