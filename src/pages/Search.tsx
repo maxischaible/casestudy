@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -36,6 +37,7 @@ export default function Search() {
   const [sortField, setSortField] = useState<'name' | 'switching_cost_score' | 'estimated_savings_rate' | 'lead_time_days' | 'country'>('switching_cost_score');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
   const [isNaturalLanguageMode, setIsNaturalLanguageMode] = useState(false);
+  const [naturalLanguageQuery, setNaturalLanguageQuery] = useState('');
 
   // Load demo data if demo=true in URL or alternative search params
   useEffect(() => {
@@ -227,81 +229,108 @@ export default function Search() {
           </div>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="part_number">Part Number</Label>
-              <Input
-                id="part_number"
-                value={partSpec.part_number}
-                onChange={(e) => setPartSpec(prev => ({ ...prev, part_number: e.target.value }))}
-                placeholder="AUTO-BRK-001"
-                className="border-primary/20 focus:border-primary"
-              />
+          {isNaturalLanguageMode ? (
+            // Natural Language Mode
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="natural-query">Describe your component needs</Label>
+                <Textarea
+                  id="natural-query"
+                  value={naturalLanguageQuery}
+                  onChange={(e) => setNaturalLanguageQuery(e.target.value)}
+                  placeholder="I need an aluminum automotive bracket made through CNC milling for 25,000 units per year with a target price around €12.50 each..."
+                  className="min-h-32 border-primary/20 focus:border-primary"
+                  rows={4}
+                />
+              </div>
+              <Button 
+                onClick={() => handleSearch()} 
+                className="w-full sm:w-auto"
+                disabled={isSearching || !naturalLanguageQuery.trim()}
+              >
+                {isSearching ? 'Searching...' : 'Find Suppliers'}
+              </Button>
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="description">Description *</Label>
-              <Input
-                id="description"
-                value={partSpec.description}
-                onChange={(e) => setPartSpec(prev => ({ ...prev, description: e.target.value }))}
-                placeholder="Automotive bracket"
-                required
-                className="border-primary/20 focus:border-primary"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="material">Material *</Label>
-              <Input
-                id="material"
-                value={partSpec.material}
-                onChange={(e) => setPartSpec(prev => ({ ...prev, material: e.target.value }))}
-                placeholder="Al 6061"
-                required
-                className="border-primary/20 focus:border-primary"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="process">Process *</Label>
-              <Input
-                id="process"
-                value={partSpec.process}
-                onChange={(e) => setPartSpec(prev => ({ ...prev, process: e.target.value }))}
-                placeholder="CNC milling"
-                required
-                className="border-primary/20 focus:border-primary"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="annual_volume">Annual Volume</Label>
-              <Input
-                id="annual_volume"
-                type="number"
-                value={partSpec.annual_volume || ''}
-                onChange={(e) => setPartSpec(prev => ({ ...prev, annual_volume: parseInt(e.target.value) || 0 }))}
-                placeholder="25000"
-                className="border-primary/20 focus:border-primary"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="target_price">Target Unit Price (€)</Label>
-              <Input
-                id="target_price"
-                type="number"
-                step="0.01"
-                value={partSpec.target_unit_price || ''}
-                onChange={(e) => setPartSpec(prev => ({ ...prev, target_unit_price: parseFloat(e.target.value) || undefined }))}
-                placeholder="12.50"
-                className="border-primary/20 focus:border-primary"
-              />
-            </div>
-          </div>
-          <Button 
-            onClick={() => handleSearch()} 
-            className="mt-4 w-full sm:w-auto"
-            disabled={isSearching}
-          >
-            {isSearching ? 'Searching...' : 'Find Suppliers'}
-          </Button>
+          ) : (
+            // Structured Form Mode
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="part_number">Part Number</Label>
+                  <Input
+                    id="part_number"
+                    value={partSpec.part_number}
+                    onChange={(e) => setPartSpec(prev => ({ ...prev, part_number: e.target.value }))}
+                    placeholder="AUTO-BRK-001"
+                    className="border-primary/20 focus:border-primary"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="description">Description *</Label>
+                  <Input
+                    id="description"
+                    value={partSpec.description}
+                    onChange={(e) => setPartSpec(prev => ({ ...prev, description: e.target.value }))}
+                    placeholder="Automotive bracket"
+                    required
+                    className="border-primary/20 focus:border-primary"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="material">Material *</Label>
+                  <Input
+                    id="material"
+                    value={partSpec.material}
+                    onChange={(e) => setPartSpec(prev => ({ ...prev, material: e.target.value }))}
+                    placeholder="Al 6061"
+                    required
+                    className="border-primary/20 focus:border-primary"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="process">Process *</Label>
+                  <Input
+                    id="process"
+                    value={partSpec.process}
+                    onChange={(e) => setPartSpec(prev => ({ ...prev, process: e.target.value }))}
+                    placeholder="CNC milling"
+                    required
+                    className="border-primary/20 focus:border-primary"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="annual_volume">Annual Volume</Label>
+                  <Input
+                    id="annual_volume"
+                    type="number"
+                    value={partSpec.annual_volume || ''}
+                    onChange={(e) => setPartSpec(prev => ({ ...prev, annual_volume: parseInt(e.target.value) || 0 }))}
+                    placeholder="25000"
+                    className="border-primary/20 focus:border-primary"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="target_price">Target Unit Price (€)</Label>
+                  <Input
+                    id="target_price"
+                    type="number"
+                    step="0.01"
+                    value={partSpec.target_unit_price || ''}
+                    onChange={(e) => setPartSpec(prev => ({ ...prev, target_unit_price: parseFloat(e.target.value) || undefined }))}
+                    placeholder="12.50"
+                    className="border-primary/20 focus:border-primary"
+                  />
+                </div>
+              </div>
+              <Button 
+                onClick={() => handleSearch()} 
+                className="mt-4 w-full sm:w-auto"
+                disabled={isSearching}
+              >
+                {isSearching ? 'Searching...' : 'Find Suppliers'}
+              </Button>
+            </>
+          )}
         </CardContent>
       </Card>
 
