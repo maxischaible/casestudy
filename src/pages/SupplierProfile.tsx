@@ -19,11 +19,14 @@ import {
   Search,
   Eye,
   TrendingDown,
-  DollarSign
+  DollarSign,
+  FileCheck
 } from 'lucide-react';
 import { getSuppliers, getCompanySuppliers, getItems } from '@/data/seed';
 import { addToShortlist, isInShortlist } from '@/lib/storage';
 import { Item } from '@/types/domain';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { useState } from 'react';
 
 export default function SupplierProfile() {
   const { id } = useParams<{ id: string }>();
@@ -190,6 +193,24 @@ export default function SupplierProfile() {
   // Mock switching score calculation for display
   const switchingScore = 75 + Math.floor(Math.random() * 20);
 
+  // Audit state management
+  const [isAuditDialogOpen, setIsAuditDialogOpen] = useState(false);
+  const [auditInitiated, setAuditInitiated] = useState(false);
+
+  const handleInitiateAudit = () => {
+    setAuditInitiated(true);
+    setIsAuditDialogOpen(false);
+    
+    // Generate mock audit ID and upload link
+    const auditId = `AUD-${new Date().getFullYear()}-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`;
+    const uploadLink = `${window.location.origin}/supplier-upload/${auditId}`;
+    
+    toast({
+      title: "Audit Initiated",
+      description: `Audit request sent to ${supplier.name}. Upload link: ${uploadLink}`
+    });
+  };
+
   return (
     <div className="max-w-6xl mx-auto space-y-6">
       {/* Header */}
@@ -216,6 +237,65 @@ export default function SupplierProfile() {
           </div>
         </div>
         <div className="flex items-center gap-3">
+          <Dialog open={isAuditDialogOpen} onOpenChange={setIsAuditDialogOpen}>
+            <DialogTrigger asChild>
+              <Button variant="outline" className="gap-2">
+                <FileCheck className="h-4 w-4" />
+                Initiate Audit
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-lg">
+              <DialogHeader>
+                <DialogTitle>Initiate Supplier Audit</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
+                <p className="text-sm text-muted-foreground">
+                  This will send an audit request to {supplier.name} with a secure upload link for:
+                </p>
+                <ul className="text-sm space-y-1 ml-4">
+                  <li>• Current certifications (PDF format)</li>
+                  <li>• Quality management documentation</li>
+                  <li>• Financial statements</li>
+                  <li>• Process capability reports</li>
+                  <li>• Safety and compliance records</li>
+                </ul>
+                <p className="text-sm text-muted-foreground">
+                  The supplier will have 14 days to complete the audit submission.
+                </p>
+                
+                {auditInitiated && (
+                  <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+                    <p className="text-sm font-medium text-green-800 mb-2">Audit Successfully Initiated!</p>
+                    <p className="text-xs text-green-700">
+                      Upload link sent to supplier: 
+                      <br />
+                      <code className="bg-green-100 px-1 rounded text-xs">
+                        {window.location.origin}/supplier-upload/AUD-2024-001
+                      </code>
+                    </p>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      className="mt-2"
+                      onClick={() => window.open('/supplier-upload/AUD-2024-001', '_blank')}
+                    >
+                      Preview Upload Portal
+                    </Button>
+                  </div>
+                )}
+                
+                <div className="flex justify-end gap-2 pt-4">
+                  <Button variant="outline" onClick={() => setIsAuditDialogOpen(false)}>
+                    Cancel
+                  </Button>
+                  <Button onClick={handleInitiateAudit} disabled={auditInitiated}>
+                    {auditInitiated ? 'Audit Sent' : 'Send Audit Request'}
+                  </Button>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+
           <Button
             onClick={handleAddToShortlist}
             disabled={isInShortlist(supplier.id)}
