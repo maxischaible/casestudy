@@ -315,52 +315,52 @@ export default function Items() {
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
-            <table className="w-full border-collapse min-w-[800px]">
+            <table className="w-full border-collapse min-w-[600px]">
               <thead>
                 <tr className="border-b">
-                  <th className="text-left p-2 w-32">
+                  <th className="text-left p-2 w-24">
                     <Button variant="ghost" onClick={() => handleSort('part_number')} className="font-medium flex items-center gap-1 text-xs">
-                      Part Number {getSortIcon('part_number')}
+                      Part No. {getSortIcon('part_number')}
                     </Button>
                   </th>
-                  <th className="text-left p-2 w-48">
+                  <th className="text-left p-2 w-40">
                     <Button variant="ghost" onClick={() => handleSort('description')} className="font-medium flex items-center gap-1 text-xs">
                       Description {getSortIcon('description')}
                     </Button>
                   </th>
-                  <th className="text-left p-2 w-28">
+                  <th className="text-left p-2 w-20">
                     <Button variant="ghost" onClick={() => handleSort('category')} className="font-medium flex items-center gap-1 text-xs">
-                      Category {getSortIcon('category')}
+                      Cat. {getSortIcon('category')}
                     </Button>
                   </th>
-                  <th className="text-left p-2 w-36">
+                  <th className="text-left p-2 w-28">
                     <Button variant="ghost" onClick={() => handleSort('current_supplier')} className="font-medium flex items-center gap-1 text-xs">
                       Supplier {getSortIcon('current_supplier')}
                     </Button>
                   </th>
-                  <th className="text-left p-2 w-20">
+                  <th className="text-left p-2 w-16">
                     <Button variant="ghost" onClick={() => handleSort('status')} className="font-medium flex items-center gap-1 text-xs">
                       Status {getSortIcon('status')}
                     </Button>
                   </th>
-                  <th className="text-left p-2 w-16">
+                  <th className="text-left p-2 w-12">
                     <Button variant="ghost" onClick={() => handleSort('criticality')} className="font-medium flex items-center gap-1 text-xs">
                       Crit. {getSortIcon('criticality')}
                     </Button>
                   </th>
-                  <th className="text-left p-2 w-28">
+                  <th className="text-left p-2 w-24">
                     <Button variant="ghost" onClick={() => handleSort('total_value')} className="font-medium flex items-center gap-1 text-xs">
-                      Annual Value {getSortIcon('total_value')}
+                      Value {getSortIcon('total_value')}
                     </Button>
                   </th>
-                  <th className="text-left p-2 w-20">Actions</th>
+                  <th className="text-left p-2 w-16">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {filteredAndSortedItems.map((item) => (
                   <tr key={item.id} className="border-b hover:bg-muted/50">
                     <td className="p-2 font-medium text-xs">{item.part_number}</td>
-                    <td className="p-2 w-48">
+                    <td className="p-2 w-40">
                       <div className="truncate text-xs" title={item.description}>
                         {item.description}
                       </div>
