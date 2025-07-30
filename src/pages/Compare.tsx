@@ -208,7 +208,7 @@ export default function Compare() {
 
         {/* Main Content */}
         <ResizablePanel defaultSize={70} minSize={60}>
-          <div className="space-y-4 lg:space-y-6 pl-4">
+          <div className="space-y-4 lg:space-y-6 pl-4 overflow-hidden">
 
           {/* RFI Action Buttons */}
           {rfiActions && (
@@ -266,9 +266,9 @@ export default function Compare() {
                     <table className="w-full border-collapse">
                       <thead>
                         <tr className="border-b">
-                          <th className="text-left p-4 font-medium">Metric</th>
-                          {filteredShortlist.map((supplier) => (
-                            <th key={supplier.id} className="text-left p-4 font-medium min-w-[200px]">
+                          <th className="text-left p-3 font-medium text-sm">Metric</th>
+                           {filteredShortlist.map((supplier) => (
+                             <th key={supplier.id} className="text-left p-3 font-medium min-w-[160px] max-w-[200px]">
                               <div className="flex items-center justify-between">
                                 {supplier.name}
                                 <Button
@@ -285,27 +285,27 @@ export default function Compare() {
                       </thead>
                       <tbody>
                         <tr className="border-b">
-                          <td className="p-4 font-medium">Location</td>
+                          <td className="p-3 font-medium text-sm">Location</td>
                           {filteredShortlist.map((supplier) => (
-                            <td key={supplier.id} className="p-4">
-                              {supplier.city}, {supplier.country}
+                            <td key={supplier.id} className="p-3 text-sm">
+                              <div className="truncate">{supplier.city}, {supplier.country}</div>
                             </td>
                           ))}
                         </tr>
                         
                         <tr className="border-b">
-                          <td className="p-4 font-medium">Certifications</td>
+                          <td className="p-3 font-medium text-sm">Certifications</td>
                           {filteredShortlist.map((supplier) => (
-                            <td key={supplier.id} className="p-4">
+                            <td key={supplier.id} className="p-3">
                               <div className="flex flex-wrap gap-1">
-                                {supplier.certifications.slice(0, 3).map((cert) => (
+                                {supplier.certifications.slice(0, 2).map((cert) => (
                                   <Badge key={cert.code} variant="secondary" className="text-xs">
                                     {cert.code}
                                   </Badge>
                                 ))}
-                                {supplier.certifications.length > 3 && (
+                                {supplier.certifications.length > 2 && (
                                   <Badge variant="outline" className="text-xs">
-                                    +{supplier.certifications.length - 3}
+                                    +{supplier.certifications.length - 2}
                                   </Badge>
                                 )}
                               </div>
@@ -314,28 +314,28 @@ export default function Compare() {
                         </tr>
                         
                         <tr className="border-b">
-                          <td className="p-4 font-medium">Lead Time</td>
+                          <td className="p-3 font-medium text-sm">Lead Time</td>
                           {filteredShortlist.map((supplier) => (
-                            <td key={supplier.id} className="p-4">
+                            <td key={supplier.id} className="p-3 text-sm">
                               {supplier.lead_time_days} days
                             </td>
                           ))}
                         </tr>
                         
                         <tr className="border-b">
-                          <td className="p-4 font-medium">MOQ</td>
+                          <td className="p-3 font-medium text-sm">MOQ</td>
                           {filteredShortlist.map((supplier) => (
-                            <td key={supplier.id} className="p-4">
+                            <td key={supplier.id} className="p-3 text-sm">
                               {supplier.moq.toLocaleString()}
                             </td>
                           ))}
                         </tr>
                         
                         <tr className="border-b">
-                          <td className="p-4 font-medium">Price Index</td>
+                          <td className="p-3 font-medium text-sm">Price Index</td>
                           {filteredShortlist.map((supplier) => (
-                            <td key={supplier.id} className="p-4">
-                              <Badge variant={supplier.price_index < 1.0 ? "default" : "secondary"}>
+                            <td key={supplier.id} className="p-3">
+                              <Badge variant={supplier.price_index < 1.0 ? "default" : "secondary"} className="text-xs">
                                 {supplier.price_index.toFixed(2)}x
                               </Badge>
                             </td>
@@ -343,46 +343,47 @@ export default function Compare() {
                         </tr>
                         
                         <tr className="border-b">
-                          <td className="p-4 font-medium">On-Time Rate</td>
+                          <td className="p-3 font-medium text-sm">On-Time Rate</td>
                           {filteredShortlist.map((supplier) => (
-                            <td key={supplier.id} className="p-4">
-                              <div className="space-y-2">
-                                <span className="text-sm">{(supplier.quality.on_time_rate * 100).toFixed(1)}%</span>
-                                <Progress value={supplier.quality.on_time_rate * 100} className="h-2" />
+                            <td key={supplier.id} className="p-3">
+                              <div className="space-y-1">
+                                <span className="text-xs">{(supplier.quality.on_time_rate * 100).toFixed(1)}%</span>
+                                <Progress value={supplier.quality.on_time_rate * 100} className="h-1" />
                               </div>
                             </td>
                           ))}
                         </tr>
                         
                         <tr className="border-b">
-                          <td className="p-4 font-medium">Defect Rate</td>
+                          <td className="p-3 font-medium text-sm">Defect Rate</td>
                           {filteredShortlist.map((supplier) => (
-                            <td key={supplier.id} className="p-4">
+                            <td key={supplier.id} className="p-3 text-sm">
                               {supplier.quality.defect_rate_ppm.toFixed(2)} PPM
                             </td>
                           ))}
                         </tr>
                         
                         <tr className="border-b">
-                          <td className="p-4 font-medium">Capacity</td>
+                          <td className="p-3 font-medium text-sm">Capacity</td>
                           {filteredShortlist.map((supplier) => (
-                            <td key={supplier.id} className="p-4">
-                              {supplier.capacity.value.toLocaleString()} {supplier.capacity.unit}
+                            <td key={supplier.id} className="p-3 text-sm">
+                              <div className="truncate">{supplier.capacity.value.toLocaleString()} {supplier.capacity.unit}</div>
                             </td>
                           ))}
                         </tr>
                         
                         <tr>
-                          <td className="p-4 font-medium">Actions</td>
+                          <td className="p-3 font-medium text-sm">Actions</td>
                           {filteredShortlist.map((supplier) => (
-                            <td key={supplier.id} className="p-4">
+                            <td key={supplier.id} className="p-3">
                               <Button
                                 variant="outline"
                                 size="sm"
                                 onClick={() => navigate(`/supplier/${supplier.id}`)}
+                                className="text-xs px-2 py-1"
                               >
-                                <Eye className="h-4 w-4 mr-2" />
-                                View Details
+                                <Eye className="h-3 w-3 mr-1" />
+                                View
                               </Button>
                             </td>
                           ))}
