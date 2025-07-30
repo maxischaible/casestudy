@@ -29,7 +29,7 @@ const App = () => (
         <FilterProvider>
           <AppShell>
             <Routes>
-              <Route path="/" element={<Demo />} />
+              <Route path="/" element={<Items />} />
               <Route path="/demo" element={<Demo />} />
               <Route path="/search" element={<Search />} />
               <Route path="/items" element={<Items />} />
