@@ -218,7 +218,7 @@ export default function Search() {
             <div className="flex items-center gap-2">
               <MessageSquare className="h-4 w-4 text-muted-foreground" />
               <Label htmlFor="natural-language-toggle" className="text-sm font-medium">
-                Natural Language
+                AI Search
               </Label>
               <Switch
                 id="natural-language-toggle"
