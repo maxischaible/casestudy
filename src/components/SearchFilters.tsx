@@ -16,7 +16,7 @@ interface SearchFiltersProps {
 export function SearchFilters({ suppliers, className = "" }: SearchFiltersProps) {
   const { filters, updateFilter, toggleCertification, toggleProcess, toggleMaterial, clearFilters } = useFilters();
   const counts = getFilterCounts(suppliers, filters);
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
 
   const regionOptions = [
     { value: 'all', label: 'All', count: suppliers.length },
