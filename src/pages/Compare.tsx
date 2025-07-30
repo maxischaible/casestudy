@@ -15,6 +15,7 @@ import { applyFilters } from '@/lib/filters';
 import { CompareFilters } from '@/components/CompareFilters';
 import ScoringPanel from '@/components/ScoringPanel';
 import ScoringResults from '@/components/ScoringResults';
+import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from '@/components/ui/resizable';
 import { Supplier } from '@/types/domain';
 
 export default function Compare() {
@@ -186,23 +187,28 @@ export default function Compare() {
         </div>
       </div>
 
-      <div className="grid lg:grid-cols-4 gap-4 lg:gap-6">
+      <ResizablePanelGroup direction="horizontal" className="min-h-[800px]">
         {/* Filters Sidebar */}
-        <div className="lg:col-span-1 order-2 lg:order-1 space-y-4">
-          <CompareFilters 
-            suppliers={shortlist} 
-            onFilteredSuppliersChange={setFilteredShortlist}
-          />
-          
-          {/* Scoring Panel */}
-          <ScoringPanel 
-            suppliers={filteredShortlist}
-            onScoreUpdate={setScoredSuppliers}
-          />
-        </div>
+        <ResizablePanel defaultSize={30} minSize={25} maxSize={40}>
+          <div className="space-y-4 pr-4">
+            <CompareFilters 
+              suppliers={shortlist} 
+              onFilteredSuppliersChange={setFilteredShortlist}
+            />
+            
+            {/* Scoring Panel */}
+            <ScoringPanel 
+              suppliers={filteredShortlist}
+              onScoreUpdate={setScoredSuppliers}
+            />
+          </div>
+        </ResizablePanel>
+
+        <ResizableHandle withHandle />
 
         {/* Main Content */}
-        <div className="lg:col-span-3 space-y-4 lg:space-y-6 order-1 lg:order-2">
+        <ResizablePanel defaultSize={70} minSize={60}>
+          <div className="space-y-4 lg:space-y-6 pl-4">
 
           {/* RFI Action Buttons */}
           {rfiActions && (
@@ -454,8 +460,9 @@ export default function Compare() {
               </div>
             </div>
           )}
-        </div>
-      </div>
+          </div>
+        </ResizablePanel>
+      </ResizablePanelGroup>
     </div>
   );
 }
