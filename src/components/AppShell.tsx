@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import { 
   Search, 
   Building2, 
@@ -141,18 +141,10 @@ function SourcingCopilot() {
 
 export default function AppShell({ children }: AppShellProps) {
   const shortlist = getShortlist();
-  const location = useLocation();
   const [open, setOpen] = useState(() => {
     const stored = localStorage.getItem('tacto_sidebar_open');
     return stored ? JSON.parse(stored) : true;
   });
-
-  // Auto-collapse sidebar when navigating to Supplier Discovery
-  useEffect(() => {
-    if (location.pathname === '/search') {
-      setOpen(false);
-    }
-  }, [location.pathname]);
 
   useEffect(() => {
     localStorage.setItem('tacto_sidebar_open', JSON.stringify(open));
