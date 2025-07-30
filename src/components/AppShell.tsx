@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import { 
   Search, 
   Building2, 
@@ -10,7 +10,11 @@ import {
   MessageSquare,
   Award,
   Package,
-  Users
+  Users,
+  AlertTriangle,
+  TrendingUp,
+  CheckCircle,
+  Lightbulb
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -34,17 +38,129 @@ const navigation = [
 
 function SourcingCopilot() {
   const [isOpen, setIsOpen] = useState(false);
+  const location = useLocation();
   
-  const getTopReasons = () => {
-    return [
-      "Strong material capabilities in aluminum alloys with automotive-grade certifications",
-      "Competitive pricing structure with 15% savings potential vs current supplier base", 
-      "Geographic proximity ensures reduced logistics costs and faster delivery times"
-    ];
+  const getContextualSuggestions = () => {
+    const currentPath = location.pathname;
+    
+    if (currentPath === '/items') {
+      return {
+        title: "Items Insights & Recommendations",
+        suggestions: [
+          {
+            type: "risk",
+            icon: AlertTriangle,
+            title: "Supply Risk Detected",
+            description: "Items ALU-2024-001, STL-2024-007, and CNC-2024-012 are at risk due to supplier financial instability",
+            action: "Review Supplier Status",
+            actionLink: "/suppliers",
+            priority: "high"
+          },
+          {
+            type: "cost",
+            icon: TrendingUp,
+            title: "Cost Optimization Opportunity", 
+            description: "Item PLT-2024-004 is 18% more expensive than market rate. Alternative suppliers available",
+            action: "Find Alternatives",
+            actionLink: "/search?part=PLT-2024-004",
+            priority: "medium"
+          },
+          {
+            type: "discovery",
+            icon: Search,
+            title: "Supplier Discovery Recommended",
+            description: "3 critical items lack backup suppliers. Initiate discovery for supply chain resilience",
+            action: "Start Discovery",
+            actionLink: "/search",
+            priority: "medium"
+          },
+          {
+            type: "compliance",
+            icon: CheckCircle,
+            title: "Certification Expiry Alert",
+            description: "ISO 9001 certificates expiring for 2 suppliers affecting 5 active items",
+            action: "View Affected Items",
+            actionLink: "/suppliers?filter=cert-expiry",
+            priority: "high"
+          }
+        ]
+      };
+    } else if (currentPath === '/suppliers') {
+      return {
+        title: "Supplier Portfolio Insights",
+        suggestions: [
+          {
+            type: "risk",
+            icon: AlertTriangle,
+            title: "High-Risk Suppliers Identified",
+            description: "2 suppliers showing financial stress indicators. Backup sourcing recommended",
+            action: "View Risk Details",
+            actionLink: "/suppliers?risk=high",
+            priority: "high"
+          },
+          {
+            type: "performance",
+            icon: TrendingUp,
+            title: "Performance Opportunities",
+            description: "3 suppliers with declining quality scores. Consider alternative sourcing",
+            action: "Find Alternatives",
+            actionLink: "/search",
+            priority: "medium"
+          }
+        ]
+      };
+    } else if (currentPath === '/search') {
+      return {
+        title: "Discovery Assistance",
+        suggestions: [
+          {
+            type: "matching",
+            icon: Bot,
+            title: "AI-Powered Matching",
+            description: "Our matching algorithm analyzes 50+ supplier criteria for optimal recommendations",
+            action: "Learn More",
+            actionLink: "#",
+            priority: "low"
+          }
+        ]
+      };
+    }
+    
+    // Default generic suggestions
+    return {
+      title: "Sourcing Intelligence",
+      suggestions: [
+        {
+          type: "general",
+          icon: Award,
+          title: "Platform Overview",
+          description: "Explore supplier discovery, risk management, and cost optimization features",
+          action: "Get Started",
+          actionLink: "/items",
+          priority: "low"
+        }
+      ]
+    };
   };
 
-  const getSuggestedRFI = () => {
-    return "Subject: RFI - Automotive Aluminum Bracket Manufacturing\n\nDear Supplier,\n\nWe are seeking quotations for precision CNC machined aluminum brackets (Al 6061) for automotive applications. Annual volume: 25,000 units. Requirements include IATF 16949 certification, dimensional tolerances per drawing, and delivery to German facility. Please provide: unit pricing, tooling costs, lead times, quality documentation, and production capacity details.\n\nLook forward to your response.";
+  const contextData = getContextualSuggestions();
+  
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case 'high': return 'text-red-600';
+      case 'medium': return 'text-yellow-600';
+      case 'low': return 'text-blue-600';
+      default: return 'text-muted-foreground';
+    }
+  };
+
+  const getPriorityBg = (priority: string) => {
+    switch (priority) {
+      case 'high': return 'bg-red-50 border-red-200';
+      case 'medium': return 'bg-yellow-50 border-yellow-200';
+      case 'low': return 'bg-blue-50 border-blue-200';
+      default: return 'bg-muted/50 border-border';
+    }
   };
 
   return (
@@ -53,10 +169,13 @@ function SourcingCopilot() {
         <Button 
           variant="outline" 
           size="sm"
-          className="gap-2"
+          className="gap-2 relative"
         >
           <Bot className="h-4 w-4" />
           Sourcing Copilot
+          {contextData.suggestions.some(s => s.priority === 'high') && (
+            <div className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full animate-pulse" />
+          )}
         </Button>
       </SheetTrigger>
       <SheetContent side="right" className="w-96">
@@ -67,70 +186,59 @@ function SourcingCopilot() {
             <Badge variant="secondary" className="text-xs">AI BETA</Badge>
           </div>
           
-          <div className="flex-1 space-y-6">
+          <div className="flex-1 space-y-4 overflow-y-auto">
             <div className="bg-gradient-to-r from-primary/5 to-primary/10 rounded-lg p-4 border border-primary/20">
-              <h3 className="font-medium mb-3 flex items-center gap-2">
-                <Award className="h-4 w-4 text-primary" />
-                Top 3 Reasons for These Matches
+              <h3 className="font-medium mb-2 flex items-center gap-2">
+                <Lightbulb className="h-4 w-4 text-primary" />
+                {contextData.title}
               </h3>
-              <ul className="space-y-3 text-sm">
-                {getTopReasons().map((reason, index) => (
-                  <li key={index} className="flex items-start gap-2">
-                    <span className="w-6 h-6 rounded-full bg-primary text-primary-foreground text-xs flex items-center justify-center mt-0.5 flex-shrink-0">
-                      {index + 1}
-                    </span>
-                    <span className="text-muted-foreground leading-relaxed">{reason}</span>
-                  </li>
-                ))}
-              </ul>
+              <p className="text-sm text-muted-foreground">
+                Based on your current view and data analysis
+              </p>
             </div>
-            
-            <div className="bg-muted/50 rounded-lg p-4">
-              <h3 className="font-medium mb-3 flex items-center gap-2">
+
+            <div className="space-y-3">
+              {contextData.suggestions.map((suggestion, index) => {
+                const IconComponent = suggestion.icon;
+                return (
+                  <div key={index} className={`rounded-lg p-4 border ${getPriorityBg(suggestion.priority)}`}>
+                    <div className="flex items-start gap-3">
+                      <IconComponent className={`h-5 w-5 mt-0.5 ${getPriorityColor(suggestion.priority)}`} />
+                      <div className="flex-1 min-w-0">
+                        <h4 className="font-medium text-sm mb-1">{suggestion.title}</h4>
+                        <p className="text-xs text-muted-foreground mb-3 leading-relaxed">
+                          {suggestion.description}
+                        </p>
+                        <Button
+                          size="sm"
+                          variant={suggestion.priority === 'high' ? 'default' : 'outline'}
+                          className="text-xs h-7"
+                          onClick={() => {
+                            // Navigate to the suggested action
+                            if (suggestion.actionLink.startsWith('/')) {
+                              window.location.href = suggestion.actionLink;
+                            }
+                          }}
+                        >
+                          {suggestion.action}
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Action buttons */}
+            <div className="border-t pt-4 mt-6 space-y-2">
+              <Button variant="outline" className="w-full gap-2 text-sm">
                 <MessageSquare className="h-4 w-4" />
-                Suggested RFI Paragraph
-              </h3>
-              <div className="bg-background border rounded-lg p-3 text-sm text-muted-foreground leading-relaxed">
-                {getSuggestedRFI()}
-              </div>
-              <Button variant="outline" size="sm" className="mt-3 w-full">
-                Copy RFI Text
+                Ask Copilot
               </Button>
-            </div>
-            
-            <div className="bg-muted/50 rounded-lg p-4">
-              <h3 className="font-medium mb-3 flex items-center gap-2">
-                <Bot className="h-4 w-4" />
-                Agent Plan (Future)
-              </h3>
-              <div className="space-y-3 text-sm">
-                <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 rounded-full bg-green-500" />
-                  <span className="text-muted-foreground">Auto-generate RFI templates based on part specs</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 rounded-full bg-orange-500" />
-                  <span className="text-muted-foreground">Schedule supplier capability assessments</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 rounded-full bg-gray-400" />
-                  <span className="text-muted-foreground">Monitor market pricing trends and alerts</span>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 rounded-full bg-gray-400" />
-                  <span className="text-muted-foreground">Automated compliance checking and updates</span>
-                </div>
-              </div>
-              
-              <div className="mt-4 p-3 bg-primary/5 border border-primary/20 rounded text-xs">
-                <div className="flex items-center gap-2">
-                  <span className="font-medium text-primary">Autonomous Agent Mode</span>
-                  <Badge variant="outline" className="text-xs border-primary text-primary">ALPHA</Badge>
-                </div>
-                <p className="text-muted-foreground mt-1">
-                  Future AI agent will autonomously execute sourcing workflows, coordinate NDAs, and manage supplier communications
-                </p>
-              </div>
+              <Button variant="ghost" className="w-full gap-2 text-sm text-muted-foreground">
+                <Settings className="h-4 w-4" />
+                Customize Insights
+              </Button>
             </div>
           </div>
         </div>
