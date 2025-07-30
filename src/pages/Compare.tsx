@@ -13,6 +13,8 @@ import { useNavigate } from 'react-router-dom';
 import { useFilters } from '@/contexts/FilterContext';
 import { applyFilters } from '@/lib/filters';
 import { CompareFilters } from '@/components/CompareFilters';
+import ScoringPanel from '@/components/ScoringPanel';
+import ScoringResults from '@/components/ScoringResults';
 import { Supplier } from '@/types/domain';
 
 export default function Compare() {
@@ -143,6 +145,13 @@ export default function Compare() {
     handleCopy: () => void;
   } | null>(null);
 
+  // Scoring state
+  const [scoredSuppliers, setScoredSuppliers] = useState<Array<{
+    supplier: Supplier;
+    totalScore: number;
+    breakdown: Record<string, number>;
+  }>>([]);
+
   if (shortlist.length === 0) {
     return (
       <div className="max-w-4xl mx-auto">
@@ -179,10 +188,16 @@ export default function Compare() {
 
       <div className="grid lg:grid-cols-4 gap-4 lg:gap-6">
         {/* Filters Sidebar */}
-        <div className="lg:col-span-1 order-2 lg:order-1">
+        <div className="lg:col-span-1 order-2 lg:order-1 space-y-4">
           <CompareFilters 
             suppliers={shortlist} 
             onFilteredSuppliersChange={setFilteredShortlist}
+          />
+          
+          {/* Scoring Panel */}
+          <ScoringPanel 
+            suppliers={filteredShortlist}
+            onScoreUpdate={setScoredSuppliers}
           />
         </div>
 
@@ -229,6 +244,9 @@ export default function Compare() {
             </Card>
           ) : (
             <div className="grid gap-6">
+              {/* Scoring Results */}
+              <ScoringResults scoredSuppliers={scoredSuppliers} />
+              
               {/* Comparison Table */}
               <Card>
                 <CardHeader>
