@@ -10,7 +10,7 @@ import { Progress } from '@/components/ui/progress';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
-import { Eye, Plus, MapPin, Clock, Package, Filter as FilterIcon, ArrowUpDown, ArrowUp, ArrowDown, MessageSquare } from 'lucide-react';
+import { Eye, Plus, MapPin, Clock, Package, Filter as FilterIcon, ArrowUpDown, ArrowUp, ArrowDown, Sparkles } from 'lucide-react';
 import { PartSpec, MatchResult } from '@/types/domain';
 import { getSuppliers, samplePartSpecs } from '@/data/seed';
 import { matchSuppliers } from '@/lib/match';
@@ -216,7 +216,7 @@ export default function Search() {
               </CardDescription>
             </div>
             <div className="flex items-center gap-2">
-              <MessageSquare className="h-4 w-4 text-muted-foreground" />
+              <Sparkles className="h-4 w-4 text-muted-foreground" />
               <Label htmlFor="natural-language-toggle" className="text-sm font-medium">
                 AI Search
               </Label>
